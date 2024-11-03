@@ -1,12 +1,16 @@
 package com.example.fitnessapp;
 
-import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout.LayoutParams;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         viewPagerAdapter = new ViewPagerAdapter(this);
         view_pager.setAdapter(viewPagerAdapter);
 
+
         // permet de sélectionner les différents tabs
         tab_page.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -64,5 +69,25 @@ public class MainActivity extends AppCompatActivity {
                 tab_page.getTabAt(position).select();
             }
         });
+
     }
+
+    // affiche le menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menuprincipal, menu);
+        return true;
+    }
+
+    // permet de cliquer les options du menu
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.mnu_settings) {
+            Intent settingsActivity = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(settingsActivity);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 }
