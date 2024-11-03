@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.example.fitnessapp.ExerciseGroupAdapter;
+import com.example.fitnessapp.WorkoutAdapter;
 import com.example.fitnessapp.R;
 import com.example.fitnessapp.objects.Exercise;
-import com.example.fitnessapp.objects.ExerciseGroup;
 import com.example.fitnessapp.objects.Set;
+import com.example.fitnessapp.objects.Workout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class WorkoutFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_workout, container, false);
 
-        RecyclerView rv_exerciseGroup = view.findViewById(R.id.rv_exerciseGroup);
+        RecyclerView rv_workout = view.findViewById(R.id.rv_workout);
         Spinner sp_day = view.findViewById(R.id.sp_day);
 
         // spinner pour les jours
@@ -55,13 +55,13 @@ public class WorkoutFragment extends Fragment {
         sets.add(new Set(8, 0, "Original"));
         ArrayList<Exercise> exercises = new ArrayList<>();
         exercises.add(new Exercise("Pushups", "Bodyweight", "", sets));
-        ExerciseGroup exerciseGroup = new ExerciseGroup(exercises);
+        Workout workout = new Workout(exercises, "Workout A", "Monday");
 
-        List<ExerciseGroup> group = new ArrayList<ExerciseGroup>();
-        group.add(exerciseGroup);
+        List<Workout> group = new ArrayList<Workout>();
+        group.add(workout);
 
-        rv_exerciseGroup.setLayoutManager(new LinearLayoutManager( getContext()));
-        rv_exerciseGroup.setAdapter(new ExerciseGroupAdapter(requireContext(), group));
+        rv_workout.setLayoutManager(new LinearLayoutManager( getContext()));
+        rv_workout.setAdapter(new WorkoutAdapter(requireContext(), group));
 
         return view;
     }

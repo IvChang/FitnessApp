@@ -1,18 +1,20 @@
 package com.example.fitnessapp.objects;
 
+import java.util.ArrayList;
+
 public class Workout {
 
-    private ExerciseGroup[] workout;
+    private ArrayList<Exercise> workout;
     private String name, day;
 
 
-    public Workout(ExerciseGroup[] workout, String name, String day) {
+    public Workout(ArrayList<Exercise> workout, String name, String day) {
         this.workout = workout;
         this.name = name;
         this.day = day;
     }
 
-    public ExerciseGroup[] getWorkout() {
+    public ArrayList<Exercise> getWorkout() {
         return workout;
     }
 
@@ -24,7 +26,7 @@ public class Workout {
         return day;
     }
 
-    public void setWorkout(ExerciseGroup[] workout) {
+    public void setWorkout(ArrayList<Exercise> workout) {
         this.workout = workout;
     }
 
