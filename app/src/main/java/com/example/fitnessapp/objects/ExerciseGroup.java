@@ -1,19 +1,21 @@
 package com.example.fitnessapp.objects;
 
+import java.util.ArrayList;
+
 public class ExerciseGroup {
 
-    private Exercise[] group;
+    private ArrayList<Exercise> group;
 
 
-    public ExerciseGroup(Exercise[] group) {
+    public ExerciseGroup(ArrayList<Exercise> group) {
         this.group = group;
     }
 
-    public Exercise[] getGroup() {
+    public ArrayList<Exercise> getGroup() {
         return group;
     }
 
-    public void setGroup(Exercise[] group) {
+    public void setGroup(ArrayList<Exercise> group) {
         this.group = group;
     }
 }

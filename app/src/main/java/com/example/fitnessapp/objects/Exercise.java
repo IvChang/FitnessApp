@@ -1,11 +1,13 @@
 package com.example.fitnessapp.objects;
 
+import java.util.ArrayList;
+
 public class Exercise {
 
     private String name, type, note;
-    private Set[] sets;
+    private ArrayList<Set> sets;
 
-    public Exercise(String name, String type, String note, Set[] sets) {
+    public Exercise(String name, String type, String note, ArrayList<Set> sets) {
         this.name = name;
         this.type = type;
         this.note = note;
@@ -36,11 +38,11 @@ public class Exercise {
         this.note = note;
     }
 
-    public Set[] getSets() {
+    public ArrayList<Set> getSets() {
         return sets;
     }
 
-    public void setSets(Set[] sets) {
+    public void setSets(ArrayList<Set> sets) {
         this.sets = sets;
     }
 }

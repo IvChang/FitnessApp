@@ -12,11 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/tab_page"
+        android:layout_marginTop="30dp"
         android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toTopOf="@+id/tab_page"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/space">
+
+    </androidx.viewpager2.widget.ViewPager2>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_page"
@@ -37,6 +40,13 @@
             android:layout_height="wrap_content"
             android:text="Progress" />
     </com.google.android.material.tabs.TabLayout>
+
+    <Space
+        android:id="@+id/space"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="130dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
