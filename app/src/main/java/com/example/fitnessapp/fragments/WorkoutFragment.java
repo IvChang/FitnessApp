@@ -6,13 +6,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.example.fitnessapp.WorkoutAdapter;
+import com.example.fitnessapp.ListAdapter;
 import com.example.fitnessapp.R;
 import com.example.fitnessapp.objects.Exercise;
 import com.example.fitnessapp.objects.Set;
@@ -52,16 +53,42 @@ public class WorkoutFragment extends Fragment {
 
         // Exercices temporaires
         ArrayList<Set> sets = new ArrayList<>();
-        sets.add(new Set(8, 0, "Original"));
+        sets.add(new Set(8, 0, ""));
+        sets.add(new Set(8, 0, ""));
+        sets.add(new Set(8, 0, ""));
+
+        ArrayList<Set> sets2 = new ArrayList<>();
+        sets2.add(new Set(7, 5, ""));
+        sets2.add(new Set(7, 5, ""));
+        sets2.add(new Set(7, 5, ""));
+        sets2.add(new Set(17, 5, ""));
+        sets2.add(new Set(17, 5, ""));
+
+        ArrayList<Set> sets3 = new ArrayList<>();
+        sets3.add(new Set(9, 1, ""));
+
+
+
+        ArrayList<Set> sets6 = new ArrayList<>();
+        sets6.add(new Set(10, 0, ""));
+        sets6.add(new Set(10, 0, ""));
+        sets6.add(new Set(10, 0, ""));
+        sets6.add(new Set(10, 0, ""));
         ArrayList<Exercise> exercises = new ArrayList<>();
         exercises.add(new Exercise("Pushups", "Bodyweight", "", sets));
+        exercises.add(new Exercise("Pushups2", "Bodyweight", "", sets2));
+        exercises.add(new Exercise("Pushups3", "Bodyweight", "", sets3));
+        exercises.add(new Exercise("Pushups4", "Bodyweight", "", sets));
+        exercises.add(new Exercise("Pushups5", "Bodyweight", "", sets));
+        exercises.add(new Exercise("Pushups6", "Bodyweight", "", sets6));
+
         Workout workout = new Workout(exercises, "Workout A", "Monday");
 
         List<Workout> group = new ArrayList<Workout>();
         group.add(workout);
 
         rv_workout.setLayoutManager(new LinearLayoutManager( getContext()));
-        rv_workout.setAdapter(new WorkoutAdapter(requireContext(), group));
+        rv_workout.setAdapter(new ListAdapter(requireContext(), group));
 
         return view;
     }
