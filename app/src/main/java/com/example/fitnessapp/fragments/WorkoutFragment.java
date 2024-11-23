@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,7 +107,7 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
     // à partir de WorkoutHolder
     @Override
-    public void onModifyButtonClick(int position, String name) {
+    public void onToggleButtonClick(int position, String name) {
 
         int posExercise = 0;
         while (!exercises.get(posExercise).getName().equals(name) && posExercise < exercises.size()) {
@@ -119,4 +122,5 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
         rv_workout.getAdapter().notifyItemRangeChanged(position + 1, exercises.get(posExercise).getSets().size());
 
     }
+
 }
