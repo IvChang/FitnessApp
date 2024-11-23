@@ -1,7 +1,7 @@
 package com.example.fitnessapp;
 
 import android.content.Context;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +12,25 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.fitnessapp.objects.Exercise;
 import com.example.fitnessapp.objects.Set;
 import com.example.fitnessapp.objects.Workout;
+import com.example.fitnessapp.fragments.OnItemInteractionListener;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private static final int VIEW_TYPE_EXERCISE = 0;
     private static final int VIEW_TYPE_SET = 1;
+    private OnItemInteractionListener listener;
 
     Context context;
     List<Workout> groups;
     private int indexSets = 0;
 
-    public ListAdapter(Context context, List<Workout> groups) {
+    public ListAdapter(Context context, List<Workout> groups, OnItemInteractionListener listener) {
         this.context = context;
         this.groups = groups;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,7 +39,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         View view;
         if (viewType == VIEW_TYPE_EXERCISE) {
             view = (LayoutInflater.from(context).inflate(R.layout.exercisegroup_view, parent, false));
-            return new WorkoutHolder(view);
+            return new WorkoutHolder(view, listener);
         } else {
             view = (LayoutInflater.from(context).inflate(R.layout.set_view, parent, false));
             return new SetHolder(view);
@@ -47,12 +50,12 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Exercise exercise = getExerciseForPosition(position);
-
         if (holder.getItemViewType() == VIEW_TYPE_EXERCISE) {
             WorkoutHolder exerciseHolder = (WorkoutHolder) holder;
 
             exerciseHolder.tv_name.setText(exercise.getName());
             exerciseHolder.tv_sets.setText(exercise.getSets().size() + " SETS");
+            exerciseHolder.bindWorkout(exercise);
 
         } else {
             SetHolder setHolder = (SetHolder) holder;
@@ -62,6 +65,17 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             setHolder.tv_setNo.setText(String.valueOf(indexSets + 1));
             setHolder.et_weight.setText(String.valueOf(set.getWeight()));
             setHolder.et_reps.setText(String.valueOf(set.getReps()));
+
+            if (set.getIsVisible()) {
+                ViewGroup.LayoutParams params = setHolder.itemView.getLayoutParams();
+                params.height = 100;
+                setHolder.itemView.setLayoutParams(params);
+            } else {
+                ViewGroup.LayoutParams params = setHolder.itemView.getLayoutParams();
+                params.height = 0;
+                setHolder.itemView.setLayoutParams(params);
+            }
+
         }
 
     }
@@ -71,7 +85,6 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Exercise getExerciseForPosition(int position) {
         int index = 0;
         for (Exercise exercise : groups.get(0).getWorkout()) {
-            Log.d("test1", "index : " + index + " vs " + exercise.getSets().size());
             if (position >= index && position <= (index + exercise.getSets().size())) {
                 return exercise;
             }
@@ -89,7 +102,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         int index = 0;
         for (Exercise exercise : groups.get(0).getWorkout()) {
             int endIndex = index + exercise.getSets().size();
-            Log.d ("test1", "index : " + index + " vs " + endIndex);
+
             if (position > index && position <= endIndex) {
                 return position - index - 1; //-1 pour exclure l'exercice
             }

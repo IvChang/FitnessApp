@@ -37,4 +37,5 @@ public class Workout {
     public void setDay(String day) {
         this.day = day;
     }
+
 }

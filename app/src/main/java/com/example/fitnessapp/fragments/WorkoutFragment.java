@@ -11,9 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fitnessapp.ListAdapter;
+import com.example.fitnessapp.MainActivity;
 import com.example.fitnessapp.R;
 import com.example.fitnessapp.objects.Exercise;
 import com.example.fitnessapp.objects.Set;
@@ -23,9 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class WorkoutFragment extends Fragment {
+public class WorkoutFragment extends Fragment implements OnItemInteractionListener {
 
     View view;
+    private RecyclerView rv_workout;
+
+    ArrayList<Exercise> exercises;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,7 +41,7 @@ public class WorkoutFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_workout, container, false);
 
-        RecyclerView rv_workout = view.findViewById(R.id.rv_workout);
+        rv_workout = view.findViewById(R.id.rv_workout);
         Spinner sp_day = view.findViewById(R.id.sp_day);
 
         // spinner pour les jours
@@ -74,7 +82,7 @@ public class WorkoutFragment extends Fragment {
         sets6.add(new Set(10, 0, ""));
         sets6.add(new Set(10, 0, ""));
         sets6.add(new Set(10, 0, ""));
-        ArrayList<Exercise> exercises = new ArrayList<>();
+        exercises = new ArrayList<>();
         exercises.add(new Exercise("Pushups", "Bodyweight", "", sets));
         exercises.add(new Exercise("Pushups2", "Bodyweight", "", sets2));
         exercises.add(new Exercise("Pushups3", "Bodyweight", "", sets3));
@@ -88,8 +96,27 @@ public class WorkoutFragment extends Fragment {
         group.add(workout);
 
         rv_workout.setLayoutManager(new LinearLayoutManager( getContext()));
-        rv_workout.setAdapter(new ListAdapter(requireContext(), group));
+        rv_workout.setAdapter(new ListAdapter(requireContext(), group, this));
 
         return view;
+    }
+
+    // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
+    // à partir de WorkoutHolder
+    @Override
+    public void onModifyButtonClick(int position, String name) {
+
+        int posExercise = 0;
+        while (!exercises.get(posExercise).getName().equals(name) && posExercise < exercises.size()) {
+            posExercise++;
+        }
+
+        for (int i = 0; i < exercises.get(posExercise).getSets().size(); i++) {
+            exercises.get(posExercise).getSets().get(i).setIsVisible(!exercises.get(posExercise).getSets().get(i).getIsVisible());
+        }
+
+        // Rafraichit les holders correspondants
+        rv_workout.getAdapter().notifyItemRangeChanged(position + 1, exercises.get(posExercise).getSets().size());
+
     }
 }

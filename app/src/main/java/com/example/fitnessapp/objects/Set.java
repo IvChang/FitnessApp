@@ -5,11 +5,13 @@ public class Set {
 
     private int reps, weight;
     private String variation;
+    private boolean isVisible;
 
     public Set(int reps, int weight, String variation) {
         this.reps = reps;
         this.weight = weight;
         this.variation = variation;
+        this.isVisible = true;
     }
 
     public int getReps() {
@@ -36,5 +38,12 @@ public class Set {
         this.variation = variation;
     }
 
+    public boolean getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(boolean isVisible) {
+        this.isVisible = isVisible;
+    }
 
 }

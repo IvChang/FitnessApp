@@ -12,6 +12,7 @@ public class SetHolder extends RecyclerView.ViewHolder {
     TextView tv_setNo;
     EditText et_weight, et_reps;
 
+
     public SetHolder(@NonNull View itemView) {
         super(itemView);
 
