@@ -2,6 +2,7 @@ package com.example.fitnessapp;
 
 import android.content.Context;
 
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,6 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     Context context;
     List<Workout> groups;
     private int indexSets = 0;
-    private int nextEndOfSets = 0;
 
     public ListAdapter(Context context, List<Workout> groups, OnItemInteractionListener listener) {
         this.context = context;
@@ -46,7 +46,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             return new WorkoutHolder(view, listener);
         } else if (viewType == VIEW_TYPE_ADDSET){
             view = (LayoutInflater.from(context).inflate(R.layout.add_set_view, parent, false));
-            return new AddSetHolder(view);
+            return new AddSetHolder(view, listener);
         } else {
             view = (LayoutInflater.from(context).inflate(R.layout.set_view, parent, false));
             return new SetHolder(view);
@@ -57,16 +57,28 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     // Modifier le holder et ses éléments
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
         Exercise exercise = getExerciseForPosition(position);
         if (holder.getItemViewType() == VIEW_TYPE_EXERCISE) {
             WorkoutHolder exerciseHolder = (WorkoutHolder) holder;
-
+            exerciseHolder.setIdExercise(exercise.getId());
+            Log.d("test1", "ListAdapter.getId() : " + exercise.getId());
             exerciseHolder.tv_name.setText(exercise.getName());
             exerciseHolder.tv_sets.setText(exercise.getSets().size() + " SETS");
             exerciseHolder.bindWorkout(exercise);
 
         } else if (holder.getItemViewType() == VIEW_TYPE_ADDSET) {
-            //AddSetHolder addSetHolder = (AddSetHolder) holder;
+            AddSetHolder addSetHolder = (AddSetHolder) holder;
+
+            if (exercise != null && exercise.getSetsAreVisible()) {
+                ViewGroup.LayoutParams params = addSetHolder.itemView.getLayoutParams();
+                params.height = 120;
+                addSetHolder.itemView.setLayoutParams(params);
+            } else {
+                ViewGroup.LayoutParams params = addSetHolder.itemView.getLayoutParams();
+                params.height = 0;
+                addSetHolder.itemView.setLayoutParams(params);
+            }
 
         } else {
 
@@ -83,10 +95,12 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                     ViewGroup.LayoutParams params = setHolder.itemView.getLayoutParams();
                     params.height = 100;
                     setHolder.itemView.setLayoutParams(params);
+                    exercise.setSetsAreVisible(true);
                 } else {
                     ViewGroup.LayoutParams params = setHolder.itemView.getLayoutParams();
                     params.height = 0;
                     setHolder.itemView.setLayoutParams(params);
+                    exercise.setSetsAreVisible(false);
                 }
             }
         }
@@ -97,7 +111,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private Exercise getExerciseForPosition(int position) {
         int index = 0;
         for (Exercise exercise : groups.get(0).getWorkout()) {
-            if (position >= index && position <= (index + exercise.getSets().size())) {
+            if (position >= index && position <= (index + exercise.getSets().size() + 1)) { // +1 pour prendre en compte le button addSet
                 return exercise;
             }
             index += exercise.getSets().size() + 2;

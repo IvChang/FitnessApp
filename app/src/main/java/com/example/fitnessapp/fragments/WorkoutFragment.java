@@ -86,12 +86,12 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
         sets6.add(new Set(10, 0, ""));
         sets6.add(new Set(10, 0, ""));
         exercises = new ArrayList<>();
-        exercises.add(new Exercise("Pushups", "Bodyweight", "", sets));
-        exercises.add(new Exercise("Pushups2", "Bodyweight", "", sets2));
-        exercises.add(new Exercise("Pushups3", "Bodyweight", "", sets3));
-        exercises.add(new Exercise("Pushups4", "Bodyweight", "", sets));
-        exercises.add(new Exercise("Pushups5", "Bodyweight", "", sets));
-        exercises.add(new Exercise("Pushups6", "Bodyweight", "", sets6));
+        exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true));
+        exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true));
+        exercises.add(new Exercise(3, "Pushups3", "Bodyweight", "", sets3, true));
+        exercises.add(new Exercise(4, "Pushups4", "Bodyweight", "", sets, true));
+        exercises.add(new Exercise(5, "Pushups5", "Bodyweight", "", sets, true));
+        exercises.add(new Exercise(6, "Pushups6", "Bodyweight", "", sets6, true));
 
         Workout workout = new Workout(exercises, "Workout A", "Monday");
 
@@ -107,20 +107,26 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
     // à partir de WorkoutHolder
     @Override
-    public void onToggleButtonClick(int position, String name) {
+    public void onToggleButtonClick(int position, int idExercise) {
 
         int posExercise = 0;
-        while (!exercises.get(posExercise).getName().equals(name) && posExercise < exercises.size()) {
+        while (exercises.get(posExercise).getId() != idExercise && posExercise < exercises.size()) {
             posExercise++;
         }
-
+        Log.d("test1", "getId() : " + exercises.get(posExercise).getId() + " idExercise : " + idExercise);
         for (int i = 0; i < exercises.get(posExercise).getSets().size(); i++) {
             exercises.get(posExercise).getSets().get(i).setIsVisible(!exercises.get(posExercise).getSets().get(i).getIsVisible());
         }
 
         // Rafraichit les holders correspondants
-        rv_workout.getAdapter().notifyItemRangeChanged(position + 1, exercises.get(posExercise).getSets().size());
+        rv_workout.getAdapter().notifyItemRangeChanged(position + 1, exercises.get(posExercise).getSets().size() + 1);
 
+    }
+
+    // TODO : check Logcat for indexExercise not updating fast enough
+    @Override
+    public void onAddSetButtonClick(int indexExercise) {
+        Log.d("test1", "exercise : " + exercises.get(indexExercise).getName() + " (" + indexExercise + ")");
     }
 
 }

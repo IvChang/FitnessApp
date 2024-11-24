@@ -1,5 +1,6 @@
 package com.example.fitnessapp;
 
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,10 +20,14 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
     TextView tv_name, tv_sets;
     ImageView iv_toggleSets, iv_exerciseOptions;
     private Exercise exercise;
+    private int idExercise;
+
 
 
     public WorkoutHolder(@NonNull View itemView, OnItemInteractionListener listener) {
         super(itemView);
+
+
 
         tv_name = itemView.findViewById(R.id.tv_name);
         tv_sets = itemView.findViewById(R.id.tv_sets);
@@ -30,12 +35,13 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
         iv_exerciseOptions = itemView.findViewById(R.id.iv_exerciseOptions);
 
 
-
+        // listener pour cacher/dévoiler les sets
         iv_toggleSets.setOnClickListener(v -> {
-            listener.onToggleButtonClick(getAdapterPosition(), tv_name.getText().toString());
+            listener.onToggleButtonClick(getAdapterPosition(), this.idExercise);
             iv_toggleSets.setRotation(iv_toggleSets.getRotation() - 180);
         });
 
+        // listener pour afficher le menu popup de l'exercice
         iv_exerciseOptions.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(itemView.getContext(), iv_exerciseOptions);
             popupMenu.setOnMenuItemClickListener(this);
@@ -53,5 +59,10 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         return false;
+    }
+
+    public void setIdExercise(int idExercise) {
+        this.idExercise = idExercise;
+        Log.d("test1", "setIdExercise : " + this.idExercise);
     }
 }
