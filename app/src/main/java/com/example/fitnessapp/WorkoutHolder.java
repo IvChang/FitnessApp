@@ -27,8 +27,6 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
     public WorkoutHolder(@NonNull View itemView, OnItemInteractionListener listener) {
         super(itemView);
 
-
-
         tv_name = itemView.findViewById(R.id.tv_name);
         tv_sets = itemView.findViewById(R.id.tv_sets);
         iv_toggleSets = itemView.findViewById(R.id.iv_toggleSets);

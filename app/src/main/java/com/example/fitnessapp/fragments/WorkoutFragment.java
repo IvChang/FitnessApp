@@ -64,34 +64,45 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
 
         // Exercices temporaires
         ArrayList<Set> sets = new ArrayList<>();
-        sets.add(new Set(8, 0, ""));
-        sets.add(new Set(8, 0, ""));
-        sets.add(new Set(8, 0, ""));
+        sets.add(new Set(1, 0, "", 0));
+        sets.add(new Set(8, 0, "", 1));
+        sets.add(new Set(8, 0, "", 2));
 
         ArrayList<Set> sets2 = new ArrayList<>();
-        sets2.add(new Set(7, 5, ""));
-        sets2.add(new Set(7, 5, ""));
-        sets2.add(new Set(7, 5, ""));
-        sets2.add(new Set(17, 5, ""));
-        sets2.add(new Set(17, 5, ""));
+        sets2.add(new Set(2, 5, "", 0));
+        sets2.add(new Set(7, 5, "", 1));
+        sets2.add(new Set(7, 5, "", 2));
+        sets2.add(new Set(17, 5, "", 3));
+        sets2.add(new Set(17, 5, "", 4));
 
         ArrayList<Set> sets3 = new ArrayList<>();
-        sets3.add(new Set(9, 1, ""));
+        sets3.add(new Set(3, 1, "",0));
 
+        ArrayList<Set> sets4 = new ArrayList<>();
+        sets4.add(new Set(4, 0, "", 0));
+        sets4.add(new Set(10, 0, "", 1));
+        sets4.add(new Set(10, 0, "", 2));
+        sets4.add(new Set(10, 0, "", 3));
+
+        ArrayList<Set> sets5 = new ArrayList<>();
+        sets5.add(new Set(5, 0, "", 0));
+        sets5.add(new Set(6, 0, "", 1));
+        sets5.add(new Set(10, 0, "", 2));
+        sets5.add(new Set(10, 0, "", 3));
 
 
         ArrayList<Set> sets6 = new ArrayList<>();
-        sets6.add(new Set(10, 0, ""));
-        sets6.add(new Set(10, 0, ""));
-        sets6.add(new Set(10, 0, ""));
-        sets6.add(new Set(10, 0, ""));
+        sets6.add(new Set(7, 0, "", 0));
+        sets6.add(new Set(10, 0, "", 1));
+        sets6.add(new Set(10, 0, "", 2));
+        sets6.add(new Set(10, 0, "", 3));
         exercises = new ArrayList<>();
-        exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true));
-        exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true));
-        exercises.add(new Exercise(3, "Pushups3", "Bodyweight", "", sets3, true));
-        exercises.add(new Exercise(4, "Pushups4", "Bodyweight", "", sets, true));
-        exercises.add(new Exercise(5, "Pushups5", "Bodyweight", "", sets, true));
-        exercises.add(new Exercise(6, "Pushups6", "Bodyweight", "", sets6, true));
+        exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0));
+        exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1));
+        exercises.add(new Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2));
+        exercises.add(new Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3));
+        exercises.add(new Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4));
+        exercises.add(new Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5));
 
         Workout workout = new Workout(exercises, "Workout A", "Monday");
 
@@ -123,10 +134,14 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
 
     }
 
-    // TODO : check Logcat for indexExercise not updating fast enough
+    // Ajoute un set de l'exercice correspondant et rafraichir la liste sans nécessairement tout rafraichir pour rien
+    // Rafraichit les positions partant de celles de WorkoutHolder de l'exercice correspondant jusqu'à la fin de la liste.
     @Override
-    public void onAddSetButtonClick(int indexExercise) {
-        Log.d("test1", "exercise : " + exercises.get(indexExercise).getName() + " (" + indexExercise + ")");
+    public void onAddSetButtonClick(int position, int indexExercise) {
+        ArrayList<Set> listSets = exercises.get(indexExercise).getSets();
+        listSets.add(new Set(0, 0, "", listSets.size()));
+        Log.d("test1", "refresh from pos : " + (position - listSets.size()) + " to " + rv_workout.getAdapter().getItemCount());
+        rv_workout.getAdapter().notifyItemRangeChanged(position - listSets.size(), rv_workout.getAdapter().getItemCount() - position);
     }
 
 }

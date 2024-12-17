@@ -62,13 +62,14 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         if (holder.getItemViewType() == VIEW_TYPE_EXERCISE) {
             WorkoutHolder exerciseHolder = (WorkoutHolder) holder;
             exerciseHolder.setIdExercise(exercise.getId());
-            Log.d("test1", "ListAdapter.getId() : " + exercise.getId());
+
             exerciseHolder.tv_name.setText(exercise.getName());
             exerciseHolder.tv_sets.setText(exercise.getSets().size() + " SETS");
             exerciseHolder.bindWorkout(exercise);
 
         } else if (holder.getItemViewType() == VIEW_TYPE_ADDSET) {
             AddSetHolder addSetHolder = (AddSetHolder) holder;
+            addSetHolder.setIndexExercise(exercise.getIndexExercise());
 
             if (exercise != null && exercise.getSetsAreVisible()) {
                 ViewGroup.LayoutParams params = addSetHolder.itemView.getLayoutParams();

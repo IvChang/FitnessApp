@@ -4,18 +4,20 @@ import java.util.ArrayList;
 
 public class Exercise {
 
-    private int id;
+    private int id, indexExercise;
     private String name, type, note;
     private boolean setsAreVisible;
     private ArrayList<Set> sets;
 
-    public Exercise(int id, String name, String type, String note, ArrayList<Set> sets, boolean setsAreVisible) {
+    public Exercise(int id, String name, String type, String note, ArrayList<Set> sets, boolean setsAreVisible,
+                    int indexExercise) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.note = note;
         this.sets = sets;
         this.setsAreVisible = setsAreVisible;
+        this.indexExercise = indexExercise;
     }
 
     public int getId() {
@@ -64,5 +66,13 @@ public class Exercise {
 
     public void setSetsAreVisible(boolean setsAreVisible) {
         this.setsAreVisible = setsAreVisible;
+    }
+
+    public int getIndexExercise() {
+        return indexExercise;
+    }
+
+    public void setIndexExercise(int indexExercise) {
+        this.indexExercise = indexExercise;
     }
 }
