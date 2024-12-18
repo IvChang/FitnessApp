@@ -49,7 +49,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             return new AddSetHolder(view, listener);
         } else {
             view = (LayoutInflater.from(context).inflate(R.layout.set_view, parent, false));
-            return new SetHolder(view);
+            return new SetHolder(view, listener);
         }
 
     }
@@ -87,6 +87,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 SetHolder setHolder = (SetHolder) holder;
                 indexSets = getSetIndexForPosition(position);
                 Set set = exercise.getSets().get(indexSets);
+                setHolder.setSet(set, exercise.getIndexExercise());
 
                 setHolder.tv_setNo.setText(String.valueOf(indexSets + 1));
                 setHolder.et_weight.setText(String.valueOf(set.getWeight()));

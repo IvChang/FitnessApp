@@ -47,4 +47,15 @@
         app:layout_constraintStart_toEndOf="@+id/et_weight"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_saveSet"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/et_reps"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/green_checkmark" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -152,4 +152,13 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
 
     }
 
+    @Override
+    public void onModifySetButtonClick(int position, int indexExercise, int indexSet, int weight, int reps) {
+        Log.d("test1", "onModifySet called");
+        Set set = exercises.get(indexExercise).getSets().get(indexSet);
+        set.setWeight(weight);
+        set.setReps(reps);
+        rv_workout.getAdapter().notifyItemChanged(position);
+    }
+
 }

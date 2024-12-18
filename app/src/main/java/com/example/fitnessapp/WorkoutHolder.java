@@ -84,7 +84,6 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
         this.exercise = exercise;
     }
 
-    // TODO : may not be required to use isEditMode
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.pop_mnu_modify) {
@@ -97,7 +96,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
             et_note.setFocusable(true);
             et_note.setFocusableInTouchMode(true);
             actv_name.requestFocus();
-            iv_exerciseOptions.setImageResource(R.drawable.checkmark);
+            iv_exerciseOptions.setImageResource(R.drawable.green_checkmark);
             inEditMode = true;
         } else if (item.getItemId() == R.id.pop_mnu_remove) {
             Log.d("test1", "remove");
