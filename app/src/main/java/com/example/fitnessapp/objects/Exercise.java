@@ -6,11 +6,11 @@ public class Exercise {
 
     private int id, indexExercise;
     private String name, type, note;
-    private boolean setsAreVisible;
+    private boolean setsAreVisible, isEditMode;
     private ArrayList<Set> sets;
 
     public Exercise(int id, String name, String type, String note, ArrayList<Set> sets, boolean setsAreVisible,
-                    int indexExercise) {
+                    int indexExercise, boolean isEditMode) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -18,6 +18,7 @@ public class Exercise {
         this.sets = sets;
         this.setsAreVisible = setsAreVisible;
         this.indexExercise = indexExercise;
+        this.isEditMode = isEditMode;
     }
 
     public int getId() {
@@ -74,5 +75,13 @@ public class Exercise {
 
     public void setIndexExercise(int indexExercise) {
         this.indexExercise = indexExercise;
+    }
+
+    public boolean getIsEditMode() {
+        return isEditMode;
+    }
+
+    public void setIsEditMode(boolean isEditMode) {
+        this.isEditMode = isEditMode;
     }
 }

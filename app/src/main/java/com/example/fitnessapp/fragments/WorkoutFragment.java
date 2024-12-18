@@ -97,12 +97,12 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
         sets6.add(new Set(10, 0, "", 2));
         sets6.add(new Set(10, 0, "", 3));
         exercises = new ArrayList<>();
-        exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0));
-        exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1));
-        exercises.add(new Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2));
-        exercises.add(new Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3));
-        exercises.add(new Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4));
-        exercises.add(new Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5));
+        exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false));
+        exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false));
+        exercises.add(new Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2, false));
+        exercises.add(new Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3, false));
+        exercises.add(new Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4, false));
+        exercises.add(new Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5, false));
 
         Workout workout = new Workout(exercises, "Workout A", "Monday");
 
@@ -138,10 +138,18 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     // Rafraichit les positions partant de celles de WorkoutHolder de l'exercice correspondant jusqu'à la fin de la liste.
     @Override
     public void onAddSetButtonClick(int position, int indexExercise) {
+
         ArrayList<Set> listSets = exercises.get(indexExercise).getSets();
         listSets.add(new Set(0, 0, "", listSets.size()));
         Log.d("test1", "refresh from pos : " + (position - listSets.size()) + " to " + rv_workout.getAdapter().getItemCount());
         rv_workout.getAdapter().notifyItemRangeChanged(position - listSets.size(), rv_workout.getAdapter().getItemCount() - position);
+    }
+
+    @Override
+    public void onModifyExerciseButtonClick(int position, int indexExercise, String name, String note) {
+        exercises.get(indexExercise - 1).setName(name);
+        exercises.get(indexExercise - 1).setNote(note);
+
     }
 
 }

@@ -9,29 +9,15 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.192"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.13"
-        tools:text="Name" />
-
-    <TextView
         android:id="@+id/tv_sets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_name"
-        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.666"
-        app:layout_constraintStart_toEndOf="@+id/tv_name"
+        app:layout_constraintHorizontal_bias="0.314"
+        app:layout_constraintStart_toEndOf="@+id/actv_name"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.129"
         tools:text="nbSets" />
 
     <View
@@ -113,20 +99,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.877" />
 
-    <TextView
-        android:id="@+id/tv_note"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:text="Note"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.435" />
-
     <ImageView
         android:id="@+id/iv_toggleSets"
         android:layout_width="43dp"
@@ -152,5 +124,41 @@
         app:layout_constraintTop_toTopOf="@+id/view"
         app:layout_constraintVertical_bias="0.123"
         app:srcCompat="@drawable/three_dots" />
+
+    <AutoCompleteTextView
+        android:id="@+id/actv_name"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:clickable="false"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="Name"
+        android:completionThreshold="2"
+        android:inputType="textNoSuggestions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.191"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.134" />
+
+    <EditText
+        android:id="@+id/et_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="Note"
+        android:clickable="false"
+        android:focusable="false"
+        android:textSize="10sp"
+        android:inputType="text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.168"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.411" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

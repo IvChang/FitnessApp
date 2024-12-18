@@ -63,7 +63,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             WorkoutHolder exerciseHolder = (WorkoutHolder) holder;
             exerciseHolder.setIdExercise(exercise.getId());
 
-            exerciseHolder.tv_name.setText(exercise.getName());
+            exerciseHolder.actv_name.setText(exercise.getName());
             exerciseHolder.tv_sets.setText(exercise.getSets().size() + " SETS");
             exerciseHolder.bindWorkout(exercise);
 
