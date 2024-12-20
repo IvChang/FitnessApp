@@ -3,9 +3,9 @@ package com.example.fitnessapp.objects;
 public class Set {
 
 
-    private int reps, weight, indexSet;
+    private int reps, weight, indexSet, newReps, newWeight;
     private String variation;
-    private boolean isVisible;
+    private boolean isVisible, isModified;
 
     public Set(int reps, int weight, String variation, int indexSet) {
         this.reps = reps;
@@ -13,6 +13,9 @@ public class Set {
         this.variation = variation;
         this.isVisible = true;
         this.indexSet = indexSet;
+        this.isModified = false;
+        this.newReps = reps;
+        this.newWeight = weight;
     }
 
     public int getReps() {
@@ -53,6 +56,30 @@ public class Set {
 
     public void setIndexSet(int indexSet) {
         this.indexSet = indexSet;
+    }
+
+    public boolean getIsModified() {
+        return isModified;
+    }
+
+    public void setIsModified(boolean isModified) {
+        this.isModified = isModified;
+    }
+
+    public int getNewReps() {
+        return newReps;
+    }
+
+    public void setNewReps(int newReps) {
+        this.newReps = newReps;
+    }
+
+    public int getNewWeight() {
+        return newWeight;
+    }
+
+    public void setNewWeight(int newWeight) {
+        this.newWeight = newWeight;
     }
 
 }

@@ -29,11 +29,12 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
     private int idExercise;
     private boolean inEditMode = false;
     String[] exerciseList;
-
+    private OnItemInteractionListener listener;
 
     public WorkoutHolder(@NonNull View itemView, OnItemInteractionListener listener) {
         super(itemView);
 
+        this.listener = listener;
         actv_name = itemView.findViewById(R.id.actv_name);
         et_note = itemView.findViewById(R.id.et_note);
         tv_sets = itemView.findViewById(R.id.tv_sets);
@@ -68,6 +69,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
                 et_note.setClickable(false);
                 et_note.setFocusable(false);
                 et_note.setFocusableInTouchMode(false);
+                listener.onModifySetModeButtonClick(false, getAdapterPosition(), idExercise);
             } else {
                 PopupMenu popupMenu = new PopupMenu(itemView.getContext(), iv_exerciseOptions);
                 popupMenu.setOnMenuItemClickListener(this);
@@ -98,6 +100,8 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
             actv_name.requestFocus();
             iv_exerciseOptions.setImageResource(R.drawable.green_checkmark);
             inEditMode = true;
+            Log.d("test1", "idExercise : " + idExercise);
+            listener.onModifySetModeButtonClick(true, getAdapterPosition(), idExercise);
         } else if (item.getItemId() == R.id.pop_mnu_remove) {
             Log.d("test1", "remove");
         }

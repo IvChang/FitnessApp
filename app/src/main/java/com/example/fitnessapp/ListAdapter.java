@@ -53,6 +53,32 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
 
     }
+    //Pour modifier les widgets d'un setHolder à partir d'une autre classe en rafraichissant certaines positions
+    // dans le RecyclerList, appellant onBindViewHolder
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
+
+        if (!payloads.isEmpty()) {
+            for (Object payload : payloads) {
+                if (holder.getItemViewType() == VIEW_TYPE_SET) {
+                    SetHolder setHolder = (SetHolder) holder;
+                    if (payload.equals("deletionMode")) {
+                        setHolder.updateImageView(true);
+                    } else if (payload.equals("normalMode")){
+                        setHolder.updateImageView(false);
+                    }
+                    Exercise exercise = getExerciseForPosition(position);
+                    indexSets = getSetIndexForPosition(position);
+                    Set set = exercise.getSets().get(indexSets);
+                    setHolder.setSet(set, exercise.getIndexExercise(), exercise.getIsEditMode());
+                }
+            }
+        } else {
+            // Appel l'autre onBindViewHolder
+            super.onBindViewHolder(holder, position, payloads);
+
+        }
+    }
 
     // Modifier le holder et ses éléments
     @Override
@@ -85,13 +111,28 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
             if (exercise != null) {
                 SetHolder setHolder = (SetHolder) holder;
+
                 indexSets = getSetIndexForPosition(position);
                 Set set = exercise.getSets().get(indexSets);
-                setHolder.setSet(set, exercise.getIndexExercise());
+                setHolder.setSet(set, exercise.getIndexExercise(), exercise.getIsEditMode());
 
                 setHolder.tv_setNo.setText(String.valueOf(indexSets + 1));
-                setHolder.et_weight.setText(String.valueOf(set.getWeight()));
-                setHolder.et_reps.setText(String.valueOf(set.getReps()));
+                if (set.getIsModified()) {
+                    setHolder.et_weight.setText(String.valueOf(set.getNewWeight()));
+                    setHolder.et_reps.setText(String.valueOf(set.getNewReps()));
+                    setHolder.iv_modifySet.setVisibility(View.VISIBLE);
+                } else {
+                    setHolder.et_weight.setText(String.valueOf(set.getWeight()));
+                    setHolder.et_reps.setText(String.valueOf(set.getReps()));
+                    setHolder.iv_modifySet.setVisibility(View.GONE);
+                }
+
+                if (exercise.getIsEditMode()) {
+                    setHolder.iv_modifySet.setVisibility(View.VISIBLE);
+                } else {
+                    setHolder.iv_modifySet.setVisibility(View.GONE);
+                }
+
 
                 if (set.getIsVisible()) {
                     ViewGroup.LayoutParams params = setHolder.itemView.getLayoutParams();
@@ -188,6 +229,16 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return false;
     }
 
+    public void updateImageView(int position, int setSize, boolean deletionMode) {
+        if (deletionMode) {
+            notifyItemRangeChanged(position + 1, setSize, "deletionMode");
+        } else {
+            notifyItemRangeChanged(position + 1, setSize, "normalMode");
+        }
+
+    }
+
+
     @Override
     public int getItemCount() {
         int nbSets = 0;
@@ -197,4 +248,6 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return groups.get(0).getWorkout().size() + nbSets;
 
     }
+
+
 }

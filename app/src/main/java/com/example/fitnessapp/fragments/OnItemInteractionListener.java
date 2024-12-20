@@ -5,4 +5,7 @@ public interface OnItemInteractionListener {
     void onAddSetButtonClick(int position, int indexExercise);
     void onModifyExerciseButtonClick(int position, int indexExercise, String name, String note);
     void onModifySetButtonClick(int position, int indexExercise, int indexSet, int weight, int reps);
+    void onModifySetModeButtonClick(boolean deletionMode, int position, int indexExercise);
+    void onChangingSetStatus(String status, int indexExercise, int indexSet, int newWeight, int newReps);
+    void onDeleteSetButtonClick(int position, int indexExercise, int indexSet);
 }

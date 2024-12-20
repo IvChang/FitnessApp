@@ -149,16 +149,54 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     public void onModifyExerciseButtonClick(int position, int indexExercise, String name, String note) {
         exercises.get(indexExercise - 1).setName(name);
         exercises.get(indexExercise - 1).setNote(note);
-
+        exercises.get(indexExercise).setIsEditMode(false);
     }
 
     @Override
     public void onModifySetButtonClick(int position, int indexExercise, int indexSet, int weight, int reps) {
-        Log.d("test1", "onModifySet called");
+        Log.d("test1", "newWeight: " + weight + " newReps : " + reps);
         Set set = exercises.get(indexExercise).getSets().get(indexSet);
         set.setWeight(weight);
         set.setReps(reps);
+        set.setIsModified(false);
         rv_workout.getAdapter().notifyItemChanged(position);
+
+    }
+
+    @Override
+    public void onModifySetModeButtonClick(boolean deletionMode, int position, int idExercise) {
+        Log.d("test1", "onModifySet deletion mode called");
+
+        exercises.get(idExercise - 1).setIsEditMode(deletionMode);
+        int setSize = exercises.get(idExercise - 1).getSets().size();
+
+        ListAdapter adapter = (ListAdapter) rv_workout.getAdapter();
+        adapter.updateImageView(position, setSize, deletionMode);
+
+    }
+
+    @Override
+    public void onChangingSetStatus(String status, int indexExercise, int indexSet, int newWeight, int newReps) {
+        Set set = exercises.get(indexExercise).getSets().get(indexSet);
+        if (status.equals("isModifiedTrue")) {
+            set.setIsModified(true);
+            set.setNewWeight(newWeight);
+            set.setNewReps(newReps);
+        } else if (status.equals("isModifiedFalse")) {
+            set.setIsModified(false);
+        }
+    }
+
+    @Override
+    public void onDeleteSetButtonClick(int position, int indexExercise, int indexSet) {
+        Log.d("test1", "onDelete called");
+        exercises.get(indexExercise).getSets().remove(indexSet);
+
+        for (int i = 0; i < exercises.get(indexExercise).getSets().size(); i++) {
+            exercises.get(indexExercise).getSets().get(i).setIndexSet(i);
+        }
+
+        rv_workout.getAdapter().notifyItemRangeChanged(position, rv_workout.getAdapter().getItemCount() - position);
     }
 
 }
