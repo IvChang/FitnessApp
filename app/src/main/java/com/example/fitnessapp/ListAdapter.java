@@ -24,6 +24,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private static final int VIEW_TYPE_EXERCISE = 0;
     private static final int VIEW_TYPE_SET = 1;
     private static final int VIEW_TYPE_ADDSET = 2;
+    private static final int VIEW_TYPE_ADDEXERCISE = 3;
     private OnItemInteractionListener listener;
 
     Context context;
@@ -47,9 +48,12 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         } else if (viewType == VIEW_TYPE_ADDSET){
             view = (LayoutInflater.from(context).inflate(R.layout.add_set_view, parent, false));
             return new AddSetHolder(view, listener);
-        } else {
+        } else if (viewType == VIEW_TYPE_SET){
             view = (LayoutInflater.from(context).inflate(R.layout.set_view, parent, false));
             return new SetHolder(view, listener);
+        } else {
+            view = (LayoutInflater.from(context).inflate(R.layout.add_exercise_view, parent, false));
+            return new AddExerciseHolder(view,listener);
         }
 
     }
@@ -87,7 +91,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         Exercise exercise = getExerciseForPosition(position);
         if (holder.getItemViewType() == VIEW_TYPE_EXERCISE) {
             WorkoutHolder exerciseHolder = (WorkoutHolder) holder;
-            exerciseHolder.setIdExercise(exercise.getId());
+            exerciseHolder.setIndexExercise(exercise.getIndexExercise());
 
             exerciseHolder.actv_name.setText(exercise.getName());
             exerciseHolder.tv_sets.setText(exercise.getSets().size() + " SETS");
@@ -107,7 +111,7 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 addSetHolder.itemView.setLayoutParams(params);
             }
 
-        } else {
+        } else if (holder.getItemViewType() == VIEW_TYPE_SET) {
 
             if (exercise != null) {
                 SetHolder setHolder = (SetHolder) holder;
@@ -180,13 +184,15 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return -1;
     }
 
-    // Determine quel type (exercise ou set) afficher dans recyclerView
+    // Determine quel type (exercise, set ou addSet) afficher dans recyclerView
     @Override
     public int getItemViewType(int position) {
         if (isExercise(position)) {
             return VIEW_TYPE_EXERCISE;
-        } else if (isEndOfSets(position)){
+        } else if (isEndOfSets(position)) {
             return VIEW_TYPE_ADDSET;
+        } else if (isEndOfList(position)) {
+            return VIEW_TYPE_ADDEXERCISE;
         } else {
             return VIEW_TYPE_SET;
         }
@@ -229,6 +235,26 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return false;
     }
 
+    private boolean isEndOfList(int position) {
+        int index = 0;
+        boolean isEndOfList = false;
+        for (Exercise exercise : groups.get(0).getWorkout()) {
+
+            if (index == 0) {
+                index += exercise.getSets().size() + 1;
+            } else {
+                index += exercise.getSets().size() + 2;
+            }
+
+        }
+        //Log.d("test1", "index : " + index); // the current last position (last add set) is position 32
+        if (position == index + 1) {
+            isEndOfList = true;
+        }
+        return isEndOfList;
+    }
+
+
     public void updateImageView(int position, int setSize, boolean deletionMode) {
         if (deletionMode) {
             notifyItemRangeChanged(position + 1, setSize, "deletionMode");
@@ -245,9 +271,10 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         for (int i = 0; i < groups.get(0).getWorkout().size(); i++) {
             nbSets += groups.get(0).getWorkout().get(i).getSets().size() + 1;
         }
-        return groups.get(0).getWorkout().size() + nbSets;
+        return groups.get(0).getWorkout().size() + nbSets + 1;
 
     }
+
 
 
 }

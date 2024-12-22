@@ -1,6 +1,8 @@
 package com.example.fitnessapp;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +28,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
     AutoCompleteTextView actv_name;
     ImageView iv_toggleSets, iv_exerciseOptions;
     private Exercise exercise;
-    private int idExercise;
+    private int indexExercise;
     private boolean inEditMode = false;
     String[] exerciseList;
     private OnItemInteractionListener listener;
@@ -50,7 +52,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
 
         // listener pour cacher/dévoiler les sets
         iv_toggleSets.setOnClickListener(v -> {
-            listener.onToggleButtonClick(getAdapterPosition(), this.idExercise);
+            listener.onToggleButtonClick(getAdapterPosition(), this.indexExercise);
             iv_toggleSets.setRotation(iv_toggleSets.getRotation() - 180);
         });
 
@@ -58,7 +60,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
         iv_exerciseOptions.setOnClickListener(v -> {
             if (inEditMode) {
 
-                listener.onModifyExerciseButtonClick(getAdapterPosition(), this.idExercise, actv_name.getText().toString()
+                listener.onModifyExerciseButtonClick(getAdapterPosition(), this.indexExercise, actv_name.getText().toString()
                         , et_note.getText().toString());
 
                 iv_exerciseOptions.setImageResource(R.drawable.three_dots);
@@ -69,7 +71,7 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
                 et_note.setClickable(false);
                 et_note.setFocusable(false);
                 et_note.setFocusableInTouchMode(false);
-                listener.onModifySetModeButtonClick(false, getAdapterPosition(), idExercise);
+                listener.onModifySetModeButtonClick(false, getAdapterPosition(), indexExercise);
             } else {
                 PopupMenu popupMenu = new PopupMenu(itemView.getContext(), iv_exerciseOptions);
                 popupMenu.setOnMenuItemClickListener(this);
@@ -100,16 +102,35 @@ public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.
             actv_name.requestFocus();
             iv_exerciseOptions.setImageResource(R.drawable.green_checkmark);
             inEditMode = true;
-            Log.d("test1", "idExercise : " + idExercise);
-            listener.onModifySetModeButtonClick(true, getAdapterPosition(), idExercise);
+            Log.d("test1", "indexExercise : " + indexExercise);
+            listener.onModifySetModeButtonClick(true, getAdapterPosition(), indexExercise);
         } else if (item.getItemId() == R.id.pop_mnu_remove) {
             Log.d("test1", "remove");
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(itemView.getContext());
+            alertDialogBuilder.setMessage("Are you sure to remove this exercise?");
+
+            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    listener.onDeleteExerciseButtonClick(getAdapterPosition(), indexExercise);
+                }
+            });
+
+            alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
         }
         return false;
     }
 
-    public void setIdExercise(int idExercise) {
-        this.idExercise = idExercise;
+    public void setIndexExercise(int indexExercise) {
+        this.indexExercise = indexExercise;
+
     }
 
     public void initializeExerciseList() {

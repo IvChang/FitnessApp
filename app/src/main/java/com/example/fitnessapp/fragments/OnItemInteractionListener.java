@@ -8,4 +8,6 @@ public interface OnItemInteractionListener {
     void onModifySetModeButtonClick(boolean deletionMode, int position, int indexExercise);
     void onChangingSetStatus(String status, int indexExercise, int indexSet, int newWeight, int newReps);
     void onDeleteSetButtonClick(int position, int indexExercise, int indexSet);
+    void onDeleteExerciseButtonClick(int position, int indexExercise);
+    void onAddExerciseButtonClick();
 }

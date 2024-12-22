@@ -95,7 +95,6 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
         sets6.add(new Set(7, 0, "", 0));
         sets6.add(new Set(10, 0, "", 1));
         sets6.add(new Set(10, 0, "", 2));
-        sets6.add(new Set(10, 0, "", 3));
         exercises = new ArrayList<>();
         exercises.add(new Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false));
         exercises.add(new Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false));
@@ -118,13 +117,13 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
     // à partir de WorkoutHolder
     @Override
-    public void onToggleButtonClick(int position, int idExercise) {
+    public void onToggleButtonClick(int position, int indexExercise) {
 
         int posExercise = 0;
-        while (exercises.get(posExercise).getId() != idExercise && posExercise < exercises.size()) {
+        while (exercises.get(posExercise).getIndexExercise() != indexExercise && posExercise < exercises.size()) {
             posExercise++;
         }
-        Log.d("test1", "getId() : " + exercises.get(posExercise).getId() + " idExercise : " + idExercise);
+        Log.d("test1", "getId() : " + exercises.get(posExercise).getIndexExercise() + " idExercise : " + indexExercise);
         for (int i = 0; i < exercises.get(posExercise).getSets().size(); i++) {
             exercises.get(posExercise).getSets().get(i).setIsVisible(!exercises.get(posExercise).getSets().get(i).getIsVisible());
         }
@@ -147,8 +146,8 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
 
     @Override
     public void onModifyExerciseButtonClick(int position, int indexExercise, String name, String note) {
-        exercises.get(indexExercise - 1).setName(name);
-        exercises.get(indexExercise - 1).setNote(note);
+        exercises.get(indexExercise).setName(name);
+        exercises.get(indexExercise).setNote(note);
         exercises.get(indexExercise).setIsEditMode(false);
     }
 
@@ -164,11 +163,11 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
     }
 
     @Override
-    public void onModifySetModeButtonClick(boolean deletionMode, int position, int idExercise) {
+    public void onModifySetModeButtonClick(boolean deletionMode, int position, int indexExercise) {
         Log.d("test1", "onModifySet deletion mode called");
 
-        exercises.get(idExercise - 1).setIsEditMode(deletionMode);
-        int setSize = exercises.get(idExercise - 1).getSets().size();
+        exercises.get(indexExercise).setIsEditMode(deletionMode);
+        int setSize = exercises.get(indexExercise).getSets().size();
 
         ListAdapter adapter = (ListAdapter) rv_workout.getAdapter();
         adapter.updateImageView(position, setSize, deletionMode);
@@ -189,14 +188,39 @@ public class WorkoutFragment extends Fragment implements OnItemInteractionListen
 
     @Override
     public void onDeleteSetButtonClick(int position, int indexExercise, int indexSet) {
-        Log.d("test1", "onDelete called");
+        Log.d("test1", "onDeleteSet called");
         exercises.get(indexExercise).getSets().remove(indexSet);
 
         for (int i = 0; i < exercises.get(indexExercise).getSets().size(); i++) {
             exercises.get(indexExercise).getSets().get(i).setIndexSet(i);
         }
 
-        rv_workout.getAdapter().notifyItemRangeChanged(position, rv_workout.getAdapter().getItemCount() - position);
+        rv_workout.getAdapter().notifyItemRemoved(position);
     }
+
+
+    @Override
+    public void onDeleteExerciseButtonClick(int position, int indexExercise) {
+        Log.d("test1", "onDeleteExercise called on " + indexExercise);
+
+        exercises.remove(indexExercise);
+
+        for (int i = indexExercise; i < exercises.size(); i++) {
+            exercises.get(i).setIndexExercise(i);
+            exercises.get(i).setId(i + 1);
+        }
+
+        if (indexExercise == exercises.size()) {
+            rv_workout.getAdapter().notifyDataSetChanged();
+        } else {
+            rv_workout.getAdapter().notifyItemRemoved(position);
+        }
+    }
+
+    @Override
+    public void onAddExerciseButtonClick() {
+        Log.d("test1", "onAddExercise called");
+    }
+
 
 }
