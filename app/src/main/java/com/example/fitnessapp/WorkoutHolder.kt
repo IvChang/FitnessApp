@@ -1,140 +1,112 @@
-package com.example.fitnessapp;
+package com.example.fitnessapp
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.util.Log;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.app.AlertDialog
+import android.util.Log
+import android.view.MenuItem
+import android.view.View
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.fragments.OnItemInteractionListener
+import com.example.fitnessapp.objects.Exercise
 
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.TextView;
+class WorkoutHolder(itemView: View, private val listener: OnItemInteractionListener) :
+    RecyclerView.ViewHolder(itemView), PopupMenu.OnMenuItemClickListener {
+    var tv_sets: TextView = itemView.findViewById(R.id.tv_sets)
+    var et_note: EditText = itemView.findViewById(R.id.et_note)
+    var actv_name: AutoCompleteTextView = itemView.findViewById(R.id.actv_name)
+    var iv_toggleSets: ImageView = itemView.findViewById(R.id.iv_toggleSets)
+    var iv_exerciseOptions: ImageView = itemView.findViewById(R.id.iv_exerciseOptions)
+    private var exercise: Exercise? = null
+    private var indexExercise = 0
+    private var inEditMode = false
+    var exerciseList: Array<String> = arrayOf("Push-Ups", "Pull-Ups", "Deadlift", "Inverted Row", "Squat", "Lunge", "Pistol Squat",
+        "Lateral Raise", "Overhead Press", "Bench Press", "Dumbbell Curl", "Dips", "Hip Thrust", "Chin-Ups", "Dumbbell Row",
+        "Nordic Curl", "Reverse Nordic Curl", "Overhead Tricep Extension", "Hammer Curl", "Romanian Deadlift")
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+    init {
 
-import com.example.fitnessapp.objects.Exercise;
-import com.example.fitnessapp.fragments.OnItemInteractionListener;
-
-public class WorkoutHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener {
-
-    TextView tv_sets;
-    EditText et_note;
-    AutoCompleteTextView actv_name;
-    ImageView iv_toggleSets, iv_exerciseOptions;
-    private Exercise exercise;
-    private int indexExercise;
-    private boolean inEditMode = false;
-    String[] exerciseList;
-    private OnItemInteractionListener listener;
-
-    public WorkoutHolder(@NonNull View itemView, OnItemInteractionListener listener) {
-        super(itemView);
-
-        this.listener = listener;
-        actv_name = itemView.findViewById(R.id.actv_name);
-        et_note = itemView.findViewById(R.id.et_note);
-        tv_sets = itemView.findViewById(R.id.tv_sets);
-        iv_toggleSets = itemView.findViewById(R.id.iv_toggleSets);
-        iv_exerciseOptions = itemView.findViewById(R.id.iv_exerciseOptions);
-
-        // Pour initialiser la liste d'exercices pour l'autocomplétion
-        initializeExerciseList();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(itemView.getContext(), android.R.layout.simple_list_item_1, exerciseList);
-        actv_name.setAdapter(adapter);
+        val adapter =
+            ArrayAdapter(itemView.context, android.R.layout.simple_list_item_1, exerciseList)
+        actv_name.setAdapter(adapter)
 
 
         // listener pour cacher/dévoiler les sets
-        iv_toggleSets.setOnClickListener(v -> {
-            listener.onToggleButtonClick(getAdapterPosition(), this.indexExercise);
-            iv_toggleSets.setRotation(iv_toggleSets.getRotation() - 180);
-        });
+        iv_toggleSets.setOnClickListener { v: View? ->
+            listener.onToggleButtonClick(adapterPosition, this.indexExercise)
+            iv_toggleSets.rotation = iv_toggleSets.rotation - 180
+        }
 
         // listener pour afficher le menu popup de l'exercice
-        iv_exerciseOptions.setOnClickListener(v -> {
+        iv_exerciseOptions.setOnClickListener { v: View? ->
             if (inEditMode) {
+                listener.onModifyExerciseButtonClick(
+                    adapterPosition, this.indexExercise, actv_name.text.toString(),
+                    et_note.text.toString()
+                )
 
-                listener.onModifyExerciseButtonClick(getAdapterPosition(), this.indexExercise, actv_name.getText().toString()
-                        , et_note.getText().toString());
-
-                iv_exerciseOptions.setImageResource(R.drawable.three_dots);
-                inEditMode = false;
-                actv_name.setClickable(false);
-                actv_name.setFocusable(false);
-                actv_name.setFocusableInTouchMode(false);
-                et_note.setClickable(false);
-                et_note.setFocusable(false);
-                et_note.setFocusableInTouchMode(false);
-                listener.onModifySetModeButtonClick(false, getAdapterPosition(), indexExercise);
+                iv_exerciseOptions.setImageResource(R.drawable.three_dots)
+                inEditMode = false
+                actv_name.isClickable = false
+                actv_name.isFocusable = false
+                actv_name.isFocusableInTouchMode = false
+                et_note.isClickable = false
+                et_note.isFocusable = false
+                et_note.isFocusableInTouchMode = false
+                listener.onModifySetModeButtonClick(false, adapterPosition, indexExercise)
             } else {
-                PopupMenu popupMenu = new PopupMenu(itemView.getContext(), iv_exerciseOptions);
-                popupMenu.setOnMenuItemClickListener(this);
-                MenuInflater inflater = popupMenu.getMenuInflater();
-                inflater.inflate(R.menu.exercisemenu, popupMenu.getMenu());
-                popupMenu.show();
+                val popupMenu = PopupMenu(itemView.context, iv_exerciseOptions)
+                popupMenu.setOnMenuItemClickListener(this)
+                val inflater = popupMenu.menuInflater
+                inflater.inflate(R.menu.exercisemenu, popupMenu.menu)
+                popupMenu.show()
+            }
+        }
+    }
+
+    fun bindWorkout(exercise: Exercise?) {
+        this.exercise = exercise
+    }
+
+    override fun onMenuItemClick(item: MenuItem): Boolean {
+        if (item.itemId == R.id.pop_mnu_modify) {
+            Log.d("test1", "modify")
+
+            actv_name.isClickable = true
+            actv_name.isFocusable = true
+            actv_name.isFocusableInTouchMode = true
+            et_note.isClickable = true
+            et_note.isFocusable = true
+            et_note.isFocusableInTouchMode = true
+            actv_name.requestFocus()
+            iv_exerciseOptions.setImageResource(R.drawable.green_checkmark)
+            inEditMode = true
+            Log.d("test1", "indexExercise : $indexExercise")
+            listener.onModifySetModeButtonClick(true, adapterPosition, indexExercise)
+        } else if (item.itemId == R.id.pop_mnu_remove) {
+            Log.d("test1", "remove")
+            val alertDialogBuilder = AlertDialog.Builder(itemView.context)
+            alertDialogBuilder.setMessage("Are you sure to remove this exercise?")
+
+            alertDialogBuilder.setPositiveButton("YES") { dialog, which ->
+                listener.onDeleteExerciseButtonClick(
+                    adapterPosition, indexExercise
+                )
             }
 
-        });
-
-    }
-
-    public void bindWorkout(Exercise exercise) {
-        this.exercise = exercise;
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId() == R.id.pop_mnu_modify) {
-            Log.d("test1", "modify");
-
-            actv_name.setClickable(true);
-            actv_name.setFocusable(true);
-            actv_name.setFocusableInTouchMode(true);
-            et_note.setClickable(true);
-            et_note.setFocusable(true);
-            et_note.setFocusableInTouchMode(true);
-            actv_name.requestFocus();
-            iv_exerciseOptions.setImageResource(R.drawable.green_checkmark);
-            inEditMode = true;
-            Log.d("test1", "indexExercise : " + indexExercise);
-            listener.onModifySetModeButtonClick(true, getAdapterPosition(), indexExercise);
-        } else if (item.getItemId() == R.id.pop_mnu_remove) {
-            Log.d("test1", "remove");
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(itemView.getContext());
-            alertDialogBuilder.setMessage("Are you sure to remove this exercise?");
-
-            alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    listener.onDeleteExerciseButtonClick(getAdapterPosition(), indexExercise);
-                }
-            });
-
-            alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+            alertDialogBuilder.setNegativeButton("NO") { dialog, which -> }
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
         }
-        return false;
+        return false
     }
 
-    public void setIndexExercise(int indexExercise) {
-        this.indexExercise = indexExercise;
-
-    }
-
-    public void initializeExerciseList() {
-        exerciseList = new String[]{"Push-Ups", "Pull-Ups", "Deadlift", "Inverted Row", "Squat"};
+    fun setIndexExercise(indexExercise: Int) {
+        this.indexExercise = indexExercise
     }
 
 }

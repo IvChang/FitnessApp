@@ -1,166 +1,177 @@
-package com.example.fitnessapp;
+package com.example.fitnessapp
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.fragments.OnItemInteractionListener
+import com.example.fitnessapp.objects.Set
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.fitnessapp.fragments.OnItemInteractionListener;
-import com.example.fitnessapp.objects.Set;
-
-public class SetHolder extends RecyclerView.ViewHolder {
-
-    TextView tv_setNo;
-    EditText et_weight, et_reps;
-    ImageView iv_modifySet;
-    private Set set;
-    private int indexExercise;
-    boolean isEditMode;
+class SetHolder(itemView: View, listener: OnItemInteractionListener) :
+    RecyclerView.ViewHolder(itemView) {
+    var tv_setNo: TextView = itemView.findViewById(R.id.tv_setNo)
+    var et_weight: EditText = itemView.findViewById(R.id.et_weight)
+    var et_reps: EditText
+    var iv_modifySet: ImageView
+    private var set: Set? = null
+    private var indexExercise = 0
+    var isEditMode: Boolean = false
 
 
-
-    public SetHolder(@NonNull View itemView, OnItemInteractionListener listener) {
-        super(itemView);
-
-        tv_setNo = itemView.findViewById(R.id.tv_setNo);
-        et_weight = itemView.findViewById(R.id.et_weight);
-        et_reps = itemView.findViewById(R.id.et_reps);
-        iv_modifySet = itemView.findViewById(R.id.iv_modifySet);
+    init {
+        et_reps = itemView.findViewById(R.id.et_reps)
+        iv_modifySet = itemView.findViewById(R.id.iv_modifySet)
 
 
-        et_weight.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+        et_weight.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!et_weight.getText().toString().matches("") && !et_reps.getText().toString().matches("")) {
-                    int newWeight = Integer.parseInt(et_weight.getText().toString());
-                    int newReps = Integer.parseInt(et_reps.getText().toString());
-                    if (newWeight != set.getWeight() || newReps != set.getReps()) {
-                        iv_modifySet.setVisibility(View.VISIBLE);
-                        iv_modifySet.setImageResource(R.drawable.green_checkmark);
-                        listener.onChangingSetStatus("isModifiedTrue", indexExercise, set.getIndexSet(), newWeight, newReps);
+            override fun afterTextChanged(s: Editable) {
+                if (!et_weight.text.toString().matches("".toRegex()) && !et_reps.text.toString()
+                        .matches("".toRegex())
+                ) {
+                    val newWeight = et_weight.text.toString().toInt()
+                    val newReps = et_reps.text.toString().toInt()
+                    if (newWeight != set!!.weight || newReps != set!!.reps) {
+                        iv_modifySet.visibility = View.VISIBLE
+                        iv_modifySet.setImageResource(R.drawable.green_checkmark)
+                        listener.onChangingSetStatus(
+                            "isModifiedTrue",
+                            indexExercise,
+                            set!!.indexSet,
+                            newWeight,
+                            newReps
+                        )
                     } else {
                         if (!isEditMode) {
-                            iv_modifySet.setVisibility(View.GONE);
+                            iv_modifySet.visibility = View.GONE
                         }
-                        iv_modifySet.setImageResource(R.drawable.delete);
-                        listener.onChangingSetStatus("isModifiedFalse", indexExercise, set.getIndexSet(), newWeight, newReps);
+                        iv_modifySet.setImageResource(R.drawable.delete)
+                        listener.onChangingSetStatus(
+                            "isModifiedFalse",
+                            indexExercise,
+                            set!!.indexSet,
+                            newWeight,
+                            newReps
+                        )
                     }
                 } else {
-                    iv_modifySet.setImageResource(R.drawable.delete);
+                    iv_modifySet.setImageResource(R.drawable.delete)
                     if (!isEditMode) {
-                        iv_modifySet.setVisibility(View.GONE);
+                        iv_modifySet.visibility = View.GONE
                     }
                 }
             }
-        });
+        })
 
-        et_reps.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        et_reps.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!et_weight.getText().toString().matches("") && !et_reps.getText().toString().matches("")) {
-                    int newWeight = Integer.parseInt(et_weight.getText().toString());
-                    int newReps = Integer.parseInt(et_reps.getText().toString());
-                    if (newWeight != set.getWeight() || newReps != set.getReps()) {
-                        iv_modifySet.setVisibility(View.VISIBLE);
-                        iv_modifySet.setImageResource(R.drawable.green_checkmark);
-                        listener.onChangingSetStatus("isModifiedTrue", indexExercise, set.getIndexSet(), newWeight, newReps);
+            override fun afterTextChanged(s: Editable) {
+                if (!et_weight.text.toString().matches("".toRegex()) && !et_reps.text.toString()
+                        .matches("".toRegex())
+                ) {
+                    val newWeight = et_weight.text.toString().toInt()
+                    val newReps = et_reps.text.toString().toInt()
+                    if (newWeight != set!!.weight || newReps != set!!.reps) {
+                        iv_modifySet.visibility = View.VISIBLE
+                        iv_modifySet.setImageResource(R.drawable.green_checkmark)
+                        listener.onChangingSetStatus(
+                            "isModifiedTrue",
+                            indexExercise,
+                            set!!.indexSet,
+                            newWeight,
+                            newReps
+                        )
                     } else {
                         if (!isEditMode) {
-                            iv_modifySet.setVisibility(View.GONE);
+                            iv_modifySet.visibility = View.GONE
                         }
-                        iv_modifySet.setImageResource(R.drawable.delete);
-                        listener.onChangingSetStatus("isModifiedFalse", indexExercise, set.getIndexSet(), newWeight, newReps);
+                        iv_modifySet.setImageResource(R.drawable.delete)
+                        listener.onChangingSetStatus(
+                            "isModifiedFalse",
+                            indexExercise,
+                            set!!.indexSet,
+                            newWeight,
+                            newReps
+                        )
                     }
                 } else {
-                    iv_modifySet.setImageResource(R.drawable.delete);
+                    iv_modifySet.setImageResource(R.drawable.delete)
                     if (!isEditMode) {
-                        iv_modifySet.setVisibility(View.GONE);
+                        iv_modifySet.visibility = View.GONE
                     }
                 }
             }
-        });
+        })
 
-        iv_modifySet.setOnClickListener(v -> {
-            Log.d("test1", "iv_modifySet called");
+        iv_modifySet.setOnClickListener { v: View? ->
+            Log.d("test1", "iv_modifySet called")
             if (isEditMode) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(itemView.getContext());
-                alertDialogBuilder.setMessage("Are you sure to remove this set?");
+                val alertDialogBuilder = AlertDialog.Builder(itemView.context)
+                alertDialogBuilder.setMessage("Are you sure to remove this set?")
 
-                alertDialogBuilder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        listener.onDeleteSetButtonClick(getAdapterPosition(), indexExercise, set.getIndexSet());
-                    }
-                });
+                alertDialogBuilder.setPositiveButton(
+                    "YES",
+                    DialogInterface.OnClickListener { dialog, which ->
+                        listener.onDeleteSetButtonClick(
+                            adapterPosition, indexExercise, set!!.indexSet
+                        )
+                    })
 
-                alertDialogBuilder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
+                alertDialogBuilder.setNegativeButton(
+                    "NO",
+                    object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface, which: Int) {
+                        }
+                    })
+                val alertDialog = alertDialogBuilder.create()
+                alertDialog.show()
             } else {
-                listener.onModifySetButtonClick(getAdapterPosition(), indexExercise, set.getIndexSet(), Integer.parseInt(et_weight.getText().toString())
-                        , Integer.parseInt(et_reps.getText().toString()));
-                iv_modifySet.setVisibility(View.GONE);
+                listener.onModifySetButtonClick(
+                    adapterPosition,
+                    indexExercise,
+                    set!!.indexSet,
+                    et_weight.text.toString().toInt(),
+                    et_reps.text.toString().toInt()
+                )
+                iv_modifySet.visibility = View.GONE
             }
-
-        });
-
+        }
     }
 
-    public void setSet(Set set, int indexExercise, boolean isEditMode) {
-        this.set = set;
-        this.indexExercise = indexExercise;
-        this.isEditMode = isEditMode;
-
+    fun setSet(set: Set?, indexExercise: Int, isEditMode: Boolean) {
+        this.set = set
+        this.indexExercise = indexExercise
+        this.isEditMode = isEditMode
     }
 
-    public void updateImageView(boolean deletionMode) {
+    fun updateImageView(deletionMode: Boolean) {
         if (deletionMode) {
-            iv_modifySet.setVisibility(View.VISIBLE);
+            iv_modifySet.visibility = View.VISIBLE
         } else {
-            if (!set.getIsModified()) {
-                iv_modifySet.setVisibility(View.GONE);
+            if (!set!!.isModified) {
+                iv_modifySet.visibility = View.GONE
             }
         }
-        if (set.getIsModified()) {
-            iv_modifySet.setImageResource(R.drawable.green_checkmark);
+        if (set!!.isModified) {
+            iv_modifySet.setImageResource(R.drawable.green_checkmark)
         } else {
-            iv_modifySet.setImageResource(R.drawable.delete);
+            iv_modifySet.setImageResource(R.drawable.delete)
         }
-
     }
-
 }

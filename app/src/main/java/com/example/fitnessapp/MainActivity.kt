@@ -1,93 +1,77 @@
-package com.example.fitnessapp;
+package com.example.fitnessapp
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.viewpager2.widget.ViewPager2;
-
-import com.google.android.material.tabs.TabLayout;
-
-public class MainActivity extends AppCompatActivity{
-
-    TabLayout tab_page;
-    ViewPager2 view_pager;
-    ViewPagerAdapter viewPagerAdapter;
+class MainActivity : AppCompatActivity() {
+    var tab_page: TabLayout? = null
+    var view_pager: ViewPager2? = null
+    var viewPagerAdapter: ViewPagerAdapter? = null
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        this.enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v: View, insets: WindowInsetsCompat ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        tab_page = findViewById(R.id.tab_page);
-        view_pager = findViewById(R.id.view_pager);
-        viewPagerAdapter = new ViewPagerAdapter(this);
-        view_pager.setAdapter(viewPagerAdapter);
-
+        tab_page = findViewById(R.id.tab_page)
+        view_pager = findViewById(R.id.view_pager)
+        viewPagerAdapter = ViewPagerAdapter(this)
+        view_pager?.setAdapter(viewPagerAdapter)
 
 
         // permet de sélectionner les différents tabs
-        tab_page.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-                view_pager.setCurrentItem(tab.getPosition());
+        tab_page?.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                view_pager?.setCurrentItem(tab.position)
             }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
+            override fun onTabUnselected(tab: TabLayout.Tab) {
             }
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
+            override fun onTabReselected(tab: TabLayout.Tab) {
             }
-        });
+        })
 
         // S'assure que le tab_page affiche le bon tab sélectionner quand on swipe le view_pager
-        view_pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                tab_page.getTabAt(position).select();
+        view_pager?.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                tab_page?.getTabAt(position)!!.select()
             }
-        });
+        })
     }
 
     // affiche le menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menuprincipal, menu);
-        return true;
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menuprincipal, menu)
+        return true
     }
 
     // permet de cliquer les options du menu
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.mnu_settings) {
-            Intent settingsActivity = new Intent(MainActivity.this, SettingActivity.class);
-            startActivity(settingsActivity);
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.mnu_settings) {
+            val settingsActivity = Intent(this@MainActivity, SettingActivity::class.java)
+            startActivity(settingsActivity)
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item)
     }
-
-
 }

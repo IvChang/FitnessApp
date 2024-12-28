@@ -1,13 +1,27 @@
-package com.example.fitnessapp.fragments;
+package com.example.fitnessapp.fragments
 
-public interface OnItemInteractionListener {
-    void onToggleButtonClick(int position, int idExercise);
-    void onAddSetButtonClick(int position, int indexExercise);
-    void onModifyExerciseButtonClick(int position, int indexExercise, String name, String note);
-    void onModifySetButtonClick(int position, int indexExercise, int indexSet, int weight, int reps);
-    void onModifySetModeButtonClick(boolean deletionMode, int position, int indexExercise);
-    void onChangingSetStatus(String status, int indexExercise, int indexSet, int newWeight, int newReps);
-    void onDeleteSetButtonClick(int position, int indexExercise, int indexSet);
-    void onDeleteExerciseButtonClick(int position, int indexExercise);
-    void onAddExerciseButtonClick();
+interface OnItemInteractionListener {
+    fun onToggleButtonClick(position: Int, idExercise: Int)
+    fun onAddSetButtonClick(position: Int, indexExercise: Int)
+    fun onModifyExerciseButtonClick(position: Int, indexExercise: Int, name: String?, note: String?)
+    fun onModifySetButtonClick(
+        position: Int,
+        indexExercise: Int,
+        indexSet: Int,
+        weight: Int,
+        reps: Int
+    )
+
+    fun onModifySetModeButtonClick(deletionMode: Boolean, position: Int, indexExercise: Int)
+    fun onChangingSetStatus(
+        status: String?,
+        indexExercise: Int,
+        indexSet: Int,
+        newWeight: Int,
+        newReps: Int
+    )
+
+    fun onDeleteSetButtonClick(position: Int, indexExercise: Int, indexSet: Int)
+    fun onDeleteExerciseButtonClick(position: Int, indexExercise: Int)
+    fun onAddExerciseButtonClick(position: Int)
 }

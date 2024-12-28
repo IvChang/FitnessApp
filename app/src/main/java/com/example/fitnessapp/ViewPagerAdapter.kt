@@ -1,38 +1,25 @@
-package com.example.fitnessapp;
+package com.example.fitnessapp
 
-import android.util.Log;
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.fitnessapp.fragments.ProgressFragment
+import com.example.fitnessapp.fragments.WorkoutFragment
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
+class ViewPagerAdapter(fragmentActivity: FragmentActivity) :
+    FragmentStateAdapter(fragmentActivity) {
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 ->                 //Log.d("Test", String.valueOf(position));
+                WorkoutFragment()
 
-import com.example.fitnessapp.fragments.ProgressFragment;
-import com.example.fitnessapp.fragments.WorkoutFragment;
-
-public class ViewPagerAdapter extends FragmentStateAdapter {
-
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
-        super(fragmentActivity);
-    }
-
-    @NonNull
-    @Override
-    public Fragment createFragment(int position) {
-        switch (position) {
-            case 0:
-                //Log.d("Test", String.valueOf(position));
-                return new WorkoutFragment();
-            case 1:
-                return new ProgressFragment();
-            default:
-                return new WorkoutFragment();
+            1 -> ProgressFragment()
+            else -> WorkoutFragment()
         }
     }
 
     //nb of tabs
-    @Override
-    public int getItemCount() {
-        return 2;
+    override fun getItemCount(): Int {
+        return 2
     }
 }

@@ -1,32 +1,24 @@
-package com.example.fitnessapp;
+package com.example.fitnessapp
 
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.View
+import android.widget.Button
+import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.fragments.OnItemInteractionListener
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class AddSetHolder(itemView: View, listener: OnItemInteractionListener) :
+    RecyclerView.ViewHolder(itemView) {
+    var btn_addSet: Button = itemView.findViewById(R.id.btn_addSet)
+    private var indexExercise = 0
 
-import com.example.fitnessapp.fragments.OnItemInteractionListener;
-
-public class AddSetHolder extends RecyclerView.ViewHolder{
-
-    Button btn_addSet;
-    private int indexExercise;
-
-    public AddSetHolder(@NonNull View itemView, OnItemInteractionListener listener) {
-        super(itemView);
-
-        btn_addSet = itemView.findViewById(R.id.btn_addSet);
-
-        btn_addSet.setOnClickListener(v -> {
-            listener.onAddSetButtonClick(getAdapterPosition(), indexExercise);
-        });
-
+    init {
+        btn_addSet.setOnClickListener { v: View? ->
+            listener.onAddSetButtonClick(
+                adapterPosition, indexExercise
+            )
+        }
     }
 
-    public void setIndexExercise(int indexExercise) {
-        this.indexExercise = indexExercise;
+    fun setIndexExercise(indexExercise: Int) {
+        this.indexExercise = indexExercise
     }
-
 }
