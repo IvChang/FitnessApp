@@ -1,6 +1,7 @@
 package com.example.fitnessapp
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -95,21 +96,29 @@ class ListAdapter(
                 setHolder.setSet(set, exercise.indexExercise, exercise.isEditMode)
 
                 setHolder.tv_setNo.text = (indexSets + 1).toString()
-                if (set.isModified) {
-                    setHolder.et_weight.setText(set.newWeight.toString())
-                    setHolder.et_reps.setText(set.newReps.toString())
-                    setHolder.iv_modifySet.visibility = View.VISIBLE
-                } else {
-                    setHolder.et_weight.setText(set.weight.toString())
-                    setHolder.et_reps.setText(set.reps.toString())
-                    setHolder.iv_modifySet.visibility = View.GONE
-                }
+                //Log.d("test1", "set " + set.indexSet + " is " + set.isModified)
 
                 if (exercise.isEditMode) {
                     setHolder.iv_modifySet.visibility = View.VISIBLE
                 } else {
                     setHolder.iv_modifySet.visibility = View.GONE
                 }
+
+                if (set.isModified) {
+                    setHolder.iv_modifySet.visibility = View.VISIBLE
+                    var newWeight = set.newWeight.toString() // pour une certaine raison, je dois faire ca pour que ca fonctionne
+                    setHolder.et_reps.setText(set.newReps.toString())
+                    setHolder.et_weight.setText(newWeight)
+
+                } else {
+                    setHolder.et_weight.setText(set.weight.toString())
+                    setHolder.et_reps.setText(set.reps.toString())
+                    if (!exercise.isEditMode) {
+                        setHolder.iv_modifySet.visibility = View.GONE
+                    }
+
+                }
+
 
 
                 if (set.isVisible) {
@@ -225,7 +234,7 @@ class ListAdapter(
 
 
     fun updateImageView(position: Int, setSize: Int, deletionMode: Boolean) {
-        if (deletionMode) {
+        if (deletionMode){
             notifyItemRangeChanged(position + 1, setSize, "deletionMode")
         } else {
             notifyItemRangeChanged(position + 1, setSize, "normalMode")

@@ -147,6 +147,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         exercises!![indexExercise].name = name!!
         exercises!![indexExercise].note = note!!
         exercises!![indexExercise].isEditMode = false
+
     }
 
     override fun onModifySetButtonClick(
@@ -172,27 +173,32 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         Log.d("test1", "onModifySet deletion mode called")
 
         exercises!![indexExercise].isEditMode = deletionMode
+
         val setSize = exercises!![indexExercise].sets.size
 
         val adapter = rv_workout!!.adapter as ListAdapter?
         adapter!!.updateImageView(position, setSize, deletionMode)
+        rv_workout!!.adapter!!.notifyItemChanged(position)
     }
 
     override fun onChangingSetStatus(
-        status: String?,
+        isModified: Boolean,
         indexExercise: Int,
         indexSet: Int,
         newWeight: Int,
         newReps: Int
     ) {
         val set = exercises!![indexExercise].sets[indexSet]
-        if (status == "isModifiedTrue") {
+
+        if (isModified) {
             set.isModified = true
             set.newWeight = newWeight
             set.newReps = newReps
-        } else if (status == "isModifiedFalse") {
+            //Log.d("test1", "set " + indexExercise.toString() + " has newReps : " + set.newReps)
+        } else {
             set.isModified = false
         }
+
     }
 
     override fun onDeleteSetButtonClick(position: Int, indexExercise: Int, indexSet: Int) {
@@ -216,8 +222,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             exercises!![i].indexExercise = i
             exercises!![i].id = i + 1
         }
-
-
         rv_workout!!.adapter!!.notifyDataSetChanged()
 
     }
@@ -227,4 +231,5 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         exercises!!.add(Exercise(exercises!!.size + 1, "New Exercise", "Bodyweight", "", ArrayList<Set>(), true, exercises!!.size, false))
         rv_workout!!.adapter!!.notifyItemInserted(position)
     }
+
 }

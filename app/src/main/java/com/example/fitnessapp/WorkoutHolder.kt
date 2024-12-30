@@ -38,25 +38,17 @@ class WorkoutHolder(itemView: View, private val listener: OnItemInteractionListe
         // listener pour cacher/dévoiler les sets
         iv_toggleSets.setOnClickListener { v: View? ->
             listener.onToggleButtonClick(adapterPosition, this.indexExercise)
-            iv_toggleSets.rotation = iv_toggleSets.rotation - 180
+            iv_toggleSets.rotation = iv_toggleSets.rotation + 180
         }
 
         // listener pour afficher le menu popup de l'exercice
         iv_exerciseOptions.setOnClickListener { v: View? ->
-            if (inEditMode) {
+            if (exercise!!.isEditMode) {
                 listener.onModifyExerciseButtonClick(
                     adapterPosition, this.indexExercise, actv_name.text.toString(),
                     et_note.text.toString()
                 )
 
-                iv_exerciseOptions.setImageResource(R.drawable.three_dots)
-                inEditMode = false
-                actv_name.isClickable = false
-                actv_name.isFocusable = false
-                actv_name.isFocusableInTouchMode = false
-                et_note.isClickable = false
-                et_note.isFocusable = false
-                et_note.isFocusableInTouchMode = false
                 listener.onModifySetModeButtonClick(false, adapterPosition, indexExercise)
             } else {
                 val popupMenu = PopupMenu(itemView.context, iv_exerciseOptions)
@@ -70,23 +62,31 @@ class WorkoutHolder(itemView: View, private val listener: OnItemInteractionListe
 
     fun bindWorkout(exercise: Exercise?) {
         this.exercise = exercise
+
+
+        actv_name.isClickable = exercise!!.isEditMode
+        actv_name.isFocusable = exercise.isEditMode
+        actv_name.isFocusableInTouchMode = exercise.isEditMode
+        et_note.isClickable = exercise.isEditMode
+        et_note.isFocusable = exercise.isEditMode
+        et_note.isFocusableInTouchMode = exercise.isEditMode
+        inEditMode = exercise.isEditMode
+
+        if (inEditMode) {
+            iv_exerciseOptions.setImageResource(R.drawable.green_checkmark)
+        } else {
+            iv_exerciseOptions.setImageResource(R.drawable.three_dots)
+        }
+
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         if (item.itemId == R.id.pop_mnu_modify) {
             Log.d("test1", "modify")
 
-            actv_name.isClickable = true
-            actv_name.isFocusable = true
-            actv_name.isFocusableInTouchMode = true
-            et_note.isClickable = true
-            et_note.isFocusable = true
-            et_note.isFocusableInTouchMode = true
-            actv_name.requestFocus()
-            iv_exerciseOptions.setImageResource(R.drawable.green_checkmark)
-            inEditMode = true
-            Log.d("test1", "indexExercise : $indexExercise")
+
             listener.onModifySetModeButtonClick(true, adapterPosition, indexExercise)
+
         } else if (item.itemId == R.id.pop_mnu_remove) {
             Log.d("test1", "remove")
             val alertDialogBuilder = AlertDialog.Builder(itemView.context)

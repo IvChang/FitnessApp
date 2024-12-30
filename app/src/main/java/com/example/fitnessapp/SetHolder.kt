@@ -22,7 +22,7 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
     private var set: Set? = null
     private var indexExercise = 0
     var isEditMode: Boolean = false
-
+    var isModified: Boolean = false
 
     init {
         et_reps = itemView.findViewById(R.id.et_reps)
@@ -46,19 +46,20 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
                         iv_modifySet.visibility = View.VISIBLE
                         iv_modifySet.setImageResource(R.drawable.green_checkmark)
                         listener.onChangingSetStatus(
-                            "isModifiedTrue",
+                            true,
                             indexExercise,
                             set!!.indexSet,
                             newWeight,
                             newReps
                         )
                     } else {
-                        if (!isEditMode) {
+                        if (!isEditMode && !isModified) {
+                            Log.d("heisenbug", "Heisenbug")
                             iv_modifySet.visibility = View.GONE
                         }
                         iv_modifySet.setImageResource(R.drawable.delete)
                         listener.onChangingSetStatus(
-                            "isModifiedFalse",
+                            false,
                             indexExercise,
                             set!!.indexSet,
                             newWeight,
@@ -67,7 +68,7 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
                     }
                 } else {
                     iv_modifySet.setImageResource(R.drawable.delete)
-                    if (!isEditMode) {
+                    if (!isEditMode && !isModified) {
                         iv_modifySet.visibility = View.GONE
                     }
                 }
@@ -91,19 +92,20 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
                         iv_modifySet.visibility = View.VISIBLE
                         iv_modifySet.setImageResource(R.drawable.green_checkmark)
                         listener.onChangingSetStatus(
-                            "isModifiedTrue",
+                            true,
                             indexExercise,
                             set!!.indexSet,
                             newWeight,
                             newReps
                         )
                     } else {
-                        if (!isEditMode) {
+                        if (!isEditMode && !isModified) {
+
                             iv_modifySet.visibility = View.GONE
                         }
                         iv_modifySet.setImageResource(R.drawable.delete)
                         listener.onChangingSetStatus(
-                            "isModifiedFalse",
+                            false,
                             indexExercise,
                             set!!.indexSet,
                             newWeight,
@@ -112,7 +114,7 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
                     }
                 } else {
                     iv_modifySet.setImageResource(R.drawable.delete)
-                    if (!isEditMode) {
+                    if (!isEditMode && !isModified) {
                         iv_modifySet.visibility = View.GONE
                     }
                 }
@@ -121,7 +123,7 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
 
         iv_modifySet.setOnClickListener { v: View? ->
             Log.d("test1", "iv_modifySet called")
-            if (isEditMode) {
+            if (isEditMode && !isModified) {
                 val alertDialogBuilder = AlertDialog.Builder(itemView.context)
                 alertDialogBuilder.setMessage("Are you sure to remove this set?")
 
@@ -158,10 +160,15 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
         this.set = set
         this.indexExercise = indexExercise
         this.isEditMode = isEditMode
+        this.isModified = set!!.isModified
+
+        if (isModified){
+            iv_modifySet.visibility = View.VISIBLE
+        }
     }
 
     fun updateImageView(deletionMode: Boolean) {
-        if (deletionMode) {
+        if (deletionMode || set!!.isModified) {
             iv_modifySet.visibility = View.VISIBLE
         } else {
             if (!set!!.isModified) {

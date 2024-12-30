@@ -14,7 +14,7 @@ interface OnItemInteractionListener {
 
     fun onModifySetModeButtonClick(deletionMode: Boolean, position: Int, indexExercise: Int)
     fun onChangingSetStatus(
-        status: String?,
+        isModified: Boolean,
         indexExercise: Int,
         indexSet: Int,
         newWeight: Int,
