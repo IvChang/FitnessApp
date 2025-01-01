@@ -8,19 +8,75 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.DOWN
+import androidx.recyclerview.widget.ItemTouchHelper.END
+import androidx.recyclerview.widget.ItemTouchHelper.START
+import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.ListAdapter
+import com.example.fitnessapp.ListAdapter.Companion.VIEW_TYPE_SET
 import com.example.fitnessapp.R
+import com.example.fitnessapp.SetHolder
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
 import com.example.fitnessapp.objects.Workout
+import java.util.Collections
 
 class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var fragmentView: View? = null
     private var rv_workout: RecyclerView? = null
 
     var exercises: ArrayList<Exercise>? = null
+
+    // TODO : drag and drop for exercises
+    val simpleCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
+
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return if(viewHolder.itemViewType == VIEW_TYPE_SET && (viewHolder as SetHolder).isEditMode) {
+                makeMovementFlags(UP or DOWN or START or END, 0)
+            } else {
+                0
+            }
+        }
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            var setHolder = viewHolder as SetHolder
+            var targetSetList = exercises!!.get(setHolder.indexExercise).sets
+
+            var fromPosition = viewHolder.adapterPosition
+            var toPosition = target.adapterPosition
+
+            val fromIndex = targetSetList[setHolder.set!!.indexSet].indexSet
+            val toIndex = targetSetList[(target as SetHolder).set!!.indexSet].indexSet
+            val holderFromIndex = setHolder.set!!.indexSet
+            val holderToIndex = (target as SetHolder).set!!.indexSet
+
+            val tempIndex = fromIndex
+
+            targetSetList[holderFromIndex].indexSet = toIndex
+            targetSetList[holderToIndex].indexSet = tempIndex
+
+            Collections.swap(targetSetList, setHolder.set!!.indexSet, (target as SetHolder).set!!.indexSet)
+
+            rv_workout!!.adapter!!.notifyItemMoved(fromPosition, toPosition)
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+        }
+
+    }
+    val itemTouchHelper = ItemTouchHelper(simpleCallback)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -92,11 +148,24 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         val group: MutableList<Workout> = ArrayList()
         group.add(workout)
 
+        val listAdapter: ListAdapter = ListAdapter(requireContext(), group, this)
+
         rv_workout?.setLayoutManager(LinearLayoutManager(context))
-        rv_workout?.setAdapter(ListAdapter(requireContext(), group, this))
+        rv_workout?.setAdapter(listAdapter)
+
+
+        itemTouchHelper.attachToRecyclerView(rv_workout)
 
         return fragmentView
     }
+
+
+
+    // Active ou désactive la fonctionnalité de drag and drop pour le recyclerView
+    fun toggleDragAndDrop(enabled: Boolean) {
+        itemTouchHelper.attachToRecyclerView(if (enabled) rv_workout else null)
+    }
+
 
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
     // à partir de WorkoutHolder

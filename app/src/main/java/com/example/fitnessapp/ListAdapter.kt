@@ -252,9 +252,9 @@ class ListAdapter(
 
 
     companion object {
-        private const val VIEW_TYPE_EXERCISE = 0
-        private const val VIEW_TYPE_SET = 1
-        private const val VIEW_TYPE_ADDSET = 2
-        private const val VIEW_TYPE_ADDEXERCISE = 3
+        const val VIEW_TYPE_EXERCISE = 0
+        const val VIEW_TYPE_SET = 1
+        const val VIEW_TYPE_ADDSET = 2
+        const val VIEW_TYPE_ADDEXERCISE = 3
     }
 }

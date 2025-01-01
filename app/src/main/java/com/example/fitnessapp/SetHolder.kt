@@ -14,13 +14,13 @@ import com.example.fitnessapp.fragments.OnItemInteractionListener
 import com.example.fitnessapp.objects.Set
 
 class SetHolder(itemView: View, listener: OnItemInteractionListener) :
-    RecyclerView.ViewHolder(itemView) {
+    RecyclerView.ViewHolder(itemView), View.OnClickListener {
     var tv_setNo: TextView = itemView.findViewById(R.id.tv_setNo)
     var et_weight: EditText = itemView.findViewById(R.id.et_weight)
     var et_reps: EditText
     var iv_modifySet: ImageView
-    private var set: Set? = null
-    private var indexExercise = 0
+    var set: Set? = null
+    var indexExercise = 0
     var isEditMode: Boolean = false
     var isModified: Boolean = false
 
@@ -180,5 +180,9 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
         } else {
             iv_modifySet.setImageResource(R.drawable.delete)
         }
+    }
+
+    override fun onClick(v: View?) {
+        TODO("Not yet implemented")
     }
 }

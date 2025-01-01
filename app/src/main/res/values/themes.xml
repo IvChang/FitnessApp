@@ -3,6 +3,7 @@
     <style name="Base.Theme.FitnessApp" parent="Theme.Material3.DayNight">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="actionBarSize">50dp</item>
     </style>
 
     <style name="Theme.FitnessApp" parent="Base.Theme.FitnessApp" />
