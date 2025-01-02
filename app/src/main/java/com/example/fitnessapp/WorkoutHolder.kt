@@ -101,6 +101,12 @@ class WorkoutHolder(itemView: View, private val listener: OnItemInteractionListe
             alertDialogBuilder.setNegativeButton("NO") { dialog, which -> }
             val alertDialog = alertDialogBuilder.create()
             alertDialog.show()
+        } else if (item.itemId == R.id.pop_mnu_moveUp) {
+            Log.d("test1", "Move Up")
+            listener.onMoveExerciseButtonClick(adapterPosition, indexExercise, "Up")
+        } else if (item.itemId == R.id.pop_mnu_moveDown) {
+            Log.d("test1", "Move Down")
+            listener.onMoveExerciseButtonClick(adapterPosition, indexExercise, "Down")
         }
         return false
     }

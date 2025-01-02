@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.DOWN
@@ -49,25 +50,28 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            var setHolder = viewHolder as SetHolder
-            var targetSetList = exercises!!.get(setHolder.indexExercise).sets
+            if (target.itemViewType == VIEW_TYPE_SET && (target as SetHolder).indexExercise == (viewHolder as SetHolder).indexExercise) {
+                var setHolder = viewHolder as SetHolder
+                var targetSetList = exercises!!.get(setHolder.indexExercise).sets
 
-            var fromPosition = viewHolder.adapterPosition
-            var toPosition = target.adapterPosition
+                var fromPosition = viewHolder.adapterPosition
+                var toPosition = target.adapterPosition
 
-            val fromIndex = targetSetList[setHolder.set!!.indexSet].indexSet
-            val toIndex = targetSetList[(target as SetHolder).set!!.indexSet].indexSet
-            val holderFromIndex = setHolder.set!!.indexSet
-            val holderToIndex = (target as SetHolder).set!!.indexSet
+                val fromIndex = targetSetList[setHolder.set!!.indexSet].indexSet
+                val toIndex = targetSetList[(target as SetHolder).set!!.indexSet].indexSet
+                val holderFromIndex = setHolder.set!!.indexSet
+                val holderToIndex = (target as SetHolder).set!!.indexSet
 
-            val tempIndex = fromIndex
+                val tempIndex = fromIndex
 
-            targetSetList[holderFromIndex].indexSet = toIndex
-            targetSetList[holderToIndex].indexSet = tempIndex
+                targetSetList[holderFromIndex].indexSet = toIndex
+                targetSetList[holderToIndex].indexSet = tempIndex
 
-            Collections.swap(targetSetList, setHolder.set!!.indexSet, (target as SetHolder).set!!.indexSet)
+                Collections.swap(targetSetList, setHolder.set!!.indexSet, (target as SetHolder).set!!.indexSet)
 
-            rv_workout!!.adapter!!.notifyItemMoved(fromPosition, toPosition)
+                rv_workout!!.adapter!!.notifyItemMoved(fromPosition, toPosition)
+            }
+
             return false
         }
 
@@ -299,6 +303,47 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         Log.d("test1", "onAddExercise called")
         exercises!!.add(Exercise(exercises!!.size + 1, "New Exercise", "Bodyweight", "", ArrayList<Set>(), true, exercises!!.size, false))
         rv_workout!!.adapter!!.notifyItemInserted(position)
+    }
+
+    override fun onMoveExerciseButtonClick(position: Int, indexExercise: Int, direction: String) {
+        val tempExercise = exercises!![indexExercise]
+        if (direction.equals("Up")) {
+            if (indexExercise > 0) {
+                val pastIndex = exercises!![indexExercise].indexExercise
+                val newIndex = exercises!![indexExercise - 1].indexExercise
+
+                exercises!![indexExercise] = exercises!![indexExercise - 1]
+                exercises!![indexExercise - 1] = tempExercise
+
+                exercises!![newIndex].indexExercise = indexExercise - 1
+                exercises!![pastIndex].indexExercise = indexExercise
+
+                val posPrevExercise = position - exercises!![pastIndex].sets.size
+                val bothSetSize = exercises!![indexExercise].sets.size + exercises!![indexExercise - 1].sets.size + 2
+
+                rv_workout!!.adapter!!.notifyItemRangeChanged(posPrevExercise, bothSetSize)
+
+            } else {
+                Toast.makeText(requireContext(), "Unable to move up", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            if (indexExercise < exercises!!.size - 1) {
+                val pastIndex = exercises!![indexExercise].indexExercise
+                val newIndex = exercises!![indexExercise + 1].indexExercise
+
+                exercises!![indexExercise] = exercises!![indexExercise + 1]
+                exercises!![indexExercise + 1] = tempExercise
+
+                exercises!![newIndex].indexExercise = indexExercise + 1
+                exercises!![pastIndex].indexExercise = indexExercise
+
+                val bothSetSize = exercises!![indexExercise].sets.size + exercises!![indexExercise + 1].sets.size + 2
+                rv_workout!!.adapter!!.notifyItemRangeChanged(position, bothSetSize)
+            } else {
+                Toast.makeText(requireContext(), "Unable to move down", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
 }

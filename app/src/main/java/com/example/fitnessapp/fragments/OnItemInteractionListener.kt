@@ -24,4 +24,5 @@ interface OnItemInteractionListener {
     fun onDeleteSetButtonClick(position: Int, indexExercise: Int, indexSet: Int)
     fun onDeleteExerciseButtonClick(position: Int, indexExercise: Int)
     fun onAddExerciseButtonClick(position: Int)
+    fun onMoveExerciseButtonClick(position: Int, indexExercise: Int, direction: String)
 }

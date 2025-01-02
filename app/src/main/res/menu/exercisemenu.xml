@@ -7,5 +7,11 @@
     <item
         android:id="@+id/pop_mnu_remove"
         android:title="Remove" />
+    <item
+        android:id="@+id/pop_mnu_moveUp"
+        android:title="Move Up" />
+    <item
+        android:id="@+id/pop_mnu_moveDown"
+        android:title="Move Down" />
 
 </menu>
