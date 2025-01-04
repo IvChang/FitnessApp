@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.fragments.OnItemInteractionListener
 import com.example.fitnessapp.objects.Exercise
 
-class WorkoutHolder(itemView: View, private val listener: OnItemInteractionListener) :
+class ExerciseHolder(itemView: View, private val listener: OnItemInteractionListener) :
     RecyclerView.ViewHolder(itemView), PopupMenu.OnMenuItemClickListener {
     var tv_sets: TextView = itemView.findViewById(R.id.tv_sets)
     var et_note: EditText = itemView.findViewById(R.id.et_note)

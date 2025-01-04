@@ -12,10 +12,14 @@ import com.example.fitnessapp.objects.Workout
 
 class ListAdapter(
     var context: Context,
-    var groups: List<Workout>,
+    var exercises: ArrayList<Exercise>?,
     private val listener: OnItemInteractionListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var indexSets = 0
+
+    fun updateExercises(exercises: ArrayList<Exercise>?) {
+        this.exercises = exercises
+    }
 
     // Décide et crée le holder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -23,7 +27,7 @@ class ListAdapter(
         if (viewType == VIEW_TYPE_EXERCISE) {
             view =
                 (LayoutInflater.from(context).inflate(R.layout.exercisegroup_view, parent, false))
-            return WorkoutHolder(view, listener)
+            return ExerciseHolder(view, listener)
         } else if (viewType == VIEW_TYPE_ADDSET) {
             view = (LayoutInflater.from(context).inflate(R.layout.add_set_view, parent, false))
             return AddSetHolder(view, listener)
@@ -68,7 +72,7 @@ class ListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val exercise = getExerciseForPosition(position)
         if (holder.itemViewType == VIEW_TYPE_EXERCISE) {
-            val exerciseHolder = holder as WorkoutHolder
+            val exerciseHolder = holder as ExerciseHolder
             exerciseHolder.setIndexExercise(exercise!!.indexExercise)
 
             exerciseHolder.actv_name.setText(exercise.name)
@@ -140,7 +144,7 @@ class ListAdapter(
     // chaque fois si la position de l'exercice qu'on parcoure correspond à la position entrée
     private fun getExerciseForPosition(position: Int): Exercise? {
         var index = 0
-        for (exercise in groups[0].workout) {
+        for (exercise in exercises!!) {
             if (position >= index && position <= (index + exercise.sets.size + 1)) { // +1 pour prendre en compte le button addSet
                 return exercise
             }
@@ -156,7 +160,7 @@ class ListAdapter(
     // le set de l'exercice.
     private fun getSetIndexForPosition(position: Int): Int {
         var index = 0
-        for (exercise in groups[0].workout) {
+        for (exercise in exercises!!) {
             val endIndex = index + exercise.sets.size
 
             if (position > index && position <= endIndex) {
@@ -184,7 +188,7 @@ class ListAdapter(
     // et vérifier si la position actuelle correspond à l'une de celles-ci
     private fun isExercise(position: Int): Boolean {
         var index = 0
-        for (exercise in groups[0].workout) {
+        for (exercise in exercises!!) {
             if (position == index) {
                 return true
             }
@@ -201,7 +205,7 @@ class ListAdapter(
     // et vérifier si la position actuelle correspond à l'une de celles-ci
     private fun isEndOfSets(position: Int): Boolean {
         var index = 0
-        for (exercise in groups[0].workout) {
+        for (exercise in exercises!!) {
             index += if (index == 0) {
                 exercise.sets.size + 1
             } else {
@@ -218,7 +222,7 @@ class ListAdapter(
     private fun isEndOfList(position: Int): Boolean {
         var index = 0
         var isEndOfList = false
-        for (exercise in groups[0].workout) {
+        for (exercise in exercises!!) {
             index += if (index == 0) {
                 exercise.sets.size + 1
             } else {
@@ -243,11 +247,19 @@ class ListAdapter(
 
 
     override fun getItemCount(): Int {
-        var nbSets = 0
-        for (i in groups[0].workout.indices) {
-            nbSets += groups[0].workout[i].sets.size + 1
+        val itemCount: Int
+        if (exercises!!.size > 0) {
+            var nbSets = 0
+
+            for (i in exercises!!.indices) {
+                nbSets += exercises!![i].sets.size + 1
+            }
+            itemCount = exercises!!.size + nbSets + 1
+        } else {
+            itemCount = 0
         }
-        return groups[0].workout.size + nbSets + 1
+
+        return itemCount
     }
 
 

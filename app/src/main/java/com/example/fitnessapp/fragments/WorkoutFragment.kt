@@ -1,11 +1,14 @@
 package com.example.fitnessapp.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -29,9 +32,15 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var fragmentView: View? = null
     private var rv_workout: RecyclerView? = null
 
-    var exercises: ArrayList<Exercise>? = null
 
-    // TODO : drag and drop for exercises
+    var exercises: ArrayList<Exercise>? = null
+    var selectedDay: String = "Monday"
+    var filteredListWorkouts: MutableList<Workout> = ArrayList()
+    val listDays = ArrayList<String>()
+    var adapterWorkout: ArrayAdapter<Workout>? = null
+    var listAdapter: ListAdapter? = null
+    var selectedWorkoutIndex: Int = 0
+
     val simpleCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
 
         override fun getMovementFlags(
@@ -90,21 +99,18 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
         rv_workout = fragmentView?.findViewById(R.id.rv_workout)
         val sp_day = fragmentView?.findViewById<Spinner>(R.id.sp_day)
+        val sp_workoutName: Spinner? = fragmentView?.findViewById(R.id.sp_workoutName)
+        val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
+        val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
 
-        // spinner pour les jours
-        val listDays = ArrayList<String>()
+        btn_addWorkout!!.setOnClickListener{v: View? ->
+            Log.d("test1", "addWorkout")
+        }
 
-        listDays.add("Monday")
-        listDays.add("Tuesday")
-        listDays.add("Wednesday")
-        listDays.add("Thursday")
-        listDays.add("Friday")
-        listDays.add("Saturday")
-        listDays.add("Sunday")
+        btn_modifyWorkout!!.setOnClickListener{v: View? ->
+            Log.d("test1", "modifyWorkout")
+        }
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listDays)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        sp_day?.adapter = adapter
 
         // Exercices temporaires
         val sets = ArrayList<Set>()
@@ -139,20 +145,120 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         sets6.add(Set(7, 6, "", 0))
         sets6.add(Set(10, 6, "", 1))
         sets6.add(Set(10, 6, "", 2))
-        exercises = ArrayList()
-        exercises!!.add(Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false))
-        exercises!!.add(Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false))
-        exercises!!.add(Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2, false))
-        exercises!!.add(Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3, false))
-        exercises!!.add(Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4, false))
-        exercises!!.add(Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5, false))
 
-        val workout = Workout(exercises!!, "Workout A", "Monday")
+        val workout = Workout(ArrayList(), "Workout A", "Monday")
+        workout.workout.add(Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false))
+        workout.workout.add(Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false))
+        workout.workout.add(Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2, false))
+        workout.workout.add(Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3, false))
+        workout.workout.add(Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4, false))
+        workout.workout.add(Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5, false))
 
-        val group: MutableList<Workout> = ArrayList()
-        group.add(workout)
 
-        val listAdapter: ListAdapter = ListAdapter(requireContext(), group, this)
+
+        val listWorkouts: MutableList<Workout> = ArrayList()
+        listWorkouts.add(workout)
+
+        val sets11 = ArrayList<Set>()
+        sets11.add(Set(1, 1, "", 0))
+        sets11.add(Set(8, 1, "", 1))
+        sets11.add(Set(8, 1, "", 2))
+
+        val workout2 = Workout(ArrayList(), "Workout B", "Monday")
+        workout2.workout.add(Exercise(1, "Pushups11", "Bodyweight", "", sets11, true, 0, false))
+
+        listWorkouts.add(workout2)
+
+
+
+        listDays.add("Monday")
+        listDays.add("Tuesday")
+        listDays.add("Wednesday")
+        listDays.add("Thursday")
+        listDays.add("Friday")
+        listDays.add("Saturday")
+        listDays.add("Sunday")
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listDays)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        sp_day?.adapter = adapter
+
+        sp_day?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                selectedDay = listDays[position]
+                Log.d("test1", selectedDay)
+
+                filteredListWorkouts.clear()
+
+                for (workout in listWorkouts) {
+                    Log.d("test1", workout.name + " (" + workout.day + ")")
+                    if (workout.day.equals(selectedDay)) {
+                        Log.d("test1", "${workout.name} is in")
+                        filteredListWorkouts.add(workout)
+                    }
+                }
+                adapterWorkout!!.notifyDataSetChanged()
+
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+        }
+
+
+        adapterWorkout = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, filteredListWorkouts)
+        adapterWorkout!!.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        sp_workoutName?.adapter = adapterWorkout
+
+
+        sp_workoutName?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+               selectedWorkoutIndex = position
+                Log.d("test1", "filteredListWorkouts : ${filteredListWorkouts.size}")
+                if (filteredListWorkouts.size > 0) {
+                    exercises = filteredListWorkouts[selectedWorkoutIndex].workout
+                    Log.d("test1", "name : ${filteredListWorkouts[selectedWorkoutIndex].name}")
+                }
+                if (listAdapter != null) {
+
+                    listAdapter!!.updateExercises(exercises)
+                    rv_workout!!.adapter!!.notifyDataSetChanged()
+                    Log.d("test1", "itemCount : ${rv_workout!!.adapter!!.itemCount}")
+                } else if (filteredListWorkouts.size > 0){
+                    listAdapter = ListAdapter(requireContext(), exercises, this@WorkoutFragment)
+                    rv_workout?.setLayoutManager(LinearLayoutManager(context))
+                    rv_workout?.setAdapter(listAdapter)
+                }
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.d("test1", "Nothing is selected")
+                listAdapter!!.updateExercises(ArrayList<Exercise>())
+                rv_workout!!.adapter!!.notifyDataSetChanged()
+            }
+
+        }
+
+        //Log.d("test1", "listAdapter : workout name : ${selectedWorkout!!.name} , ${selectedWorkout!!.workout.size}")
+
+        if (filteredListWorkouts.size > 0) {
+            listAdapter = ListAdapter(requireContext(), exercises, this)
+        } else {
+            listAdapter = null
+        }
+
 
         rv_workout?.setLayoutManager(LinearLayoutManager(context))
         rv_workout?.setAdapter(listAdapter)
@@ -163,12 +269,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         return fragmentView
     }
 
-
-
-    // Active ou désactive la fonctionnalité de drag and drop pour le recyclerView
-    fun toggleDragAndDrop(enabled: Boolean) {
-        itemTouchHelper.attachToRecyclerView(if (enabled) rv_workout else null)
-    }
 
 
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
@@ -261,6 +361,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         newWeight: Int,
         newReps: Int
     ) {
+        Log.d("test1", "exercises[${indexExercise}].sets[${indexSet}]")
         val set = exercises!![indexExercise].sets[indexSet]
 
         if (isModified) {
