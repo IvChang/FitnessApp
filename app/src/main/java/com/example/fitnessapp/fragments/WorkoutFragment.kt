@@ -1,6 +1,8 @@
 package com.example.fitnessapp.fragments
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +13,8 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.DOWN
@@ -21,8 +25,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.ListAdapter
 import com.example.fitnessapp.ListAdapter.Companion.VIEW_TYPE_SET
+import com.example.fitnessapp.MainActivity
 import com.example.fitnessapp.R
 import com.example.fitnessapp.SetHolder
+import com.example.fitnessapp.SettingActivity
+import com.example.fitnessapp.WorkoutActivity
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
 import com.example.fitnessapp.objects.Workout
@@ -32,7 +39,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var fragmentView: View? = null
     private var rv_workout: RecyclerView? = null
 
-
+    val listWorkouts: ArrayList<Workout> = ArrayList()
     var exercises: ArrayList<Exercise>? = null
     var selectedDay: String = "Monday"
     var filteredListWorkouts: MutableList<Workout> = ArrayList()
@@ -40,6 +47,8 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var adapterWorkout: ArrayAdapter<Workout>? = null
     var listAdapter: ListAdapter? = null
     var selectedWorkoutIndex: Int = 0
+
+    private lateinit var startForResult: ActivityResultLauncher<Intent>
 
     val simpleCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
 
@@ -91,6 +100,9 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     }
     val itemTouchHelper = ItemTouchHelper(simpleCallback)
 
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -103,13 +115,37 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
         val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
 
-        btn_addWorkout!!.setOnClickListener{v: View? ->
-            Log.d("test1", "addWorkout")
+        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Log.d("test1", "data received successfully")
+                val bundle: Bundle? = result.data!!.extras
+                val newWorkout: Workout? = bundle?.getParcelable("WORKOUT")
+                Log.d("test1", newWorkout!!.name!!)
+                listWorkouts.add(newWorkout)
+                if (newWorkout.day!!.equals(selectedDay)) {
+                    filteredListWorkouts.add(newWorkout)
+                }
+            } else {
+                Log.d("test1", "error with result")
+            }
         }
 
-        btn_modifyWorkout!!.setOnClickListener{v: View? ->
+
+        btn_addWorkout?.setOnClickListener{v: View? ->
+            Log.d("test1", "addWorkout")
+
+            val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
+            var b_workouts: Bundle = Bundle()
+            b_workouts.putParcelableArrayList("LIST", listWorkouts)
+            workoutActivity.putExtras(b_workouts)
+            startForResult.launch(workoutActivity)
+
+        }
+
+        btn_modifyWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "modifyWorkout")
         }
+
 
 
         // Exercices temporaires
@@ -156,7 +192,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
 
 
-        val listWorkouts: MutableList<Workout> = ArrayList()
+
         listWorkouts.add(workout)
 
         val sets11 = ArrayList<Set>()
@@ -268,6 +304,8 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
         return fragmentView
     }
+
+
 
 
 

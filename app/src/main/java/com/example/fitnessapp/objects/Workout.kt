@@ -1,8 +1,39 @@
 package com.example.fitnessapp.objects
 
-class Workout(@JvmField var workout: ArrayList<Exercise>, var name: String, var day: String) {
+import android.os.Parcel
+import android.os.Parcelable
+
+class Workout(@JvmField var workout: ArrayList<Exercise>, var name: String?, var day: String?) :
+    Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.createTypedArrayList(Exercise.CREATOR) ?: arrayListOf(),
+        parcel.readString(),
+        parcel.readString()
+
+    )
+
     override fun toString(): String {
-        return name
+        return name.toString()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeTypedList(workout)
+        parcel.writeString(name)
+        parcel.writeString(day)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Workout> {
+        override fun createFromParcel(parcel: Parcel): Workout {
+            return Workout(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Workout?> {
+            return arrayOfNulls(size)
+        }
     }
 
 }
