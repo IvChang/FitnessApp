@@ -2,6 +2,8 @@ package com.example.fitnessapp.fragments
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -41,7 +43,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
     val listWorkouts: ArrayList<Workout> = ArrayList()
     var exercises: ArrayList<Exercise>? = null
-    var selectedDay: String = "Monday"
+    var selectedDay: String = "Mon"
     var filteredListWorkouts: MutableList<Workout> = ArrayList()
     val listDays = ArrayList<String>()
     var adapterWorkout: ArrayAdapter<Workout>? = null
@@ -114,17 +116,34 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         val sp_workoutName: Spinner? = fragmentView?.findViewById(R.id.sp_workoutName)
         val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
         val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
+        val btn_deleteWOrkout: Button? = fragmentView?.findViewById(R.id.btn_deleteWorkout)
 
         startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 Log.d("test1", "data received successfully")
                 val bundle: Bundle? = result.data!!.extras
                 val newWorkout: Workout? = bundle?.getParcelable("WORKOUT")
+                val modification: Boolean? = bundle?.getBoolean("MODIFICATION")
+                val indexDay: Int? = bundle?.getInt("DAY")
                 Log.d("test1", newWorkout!!.name!!)
-                listWorkouts.add(newWorkout)
-                if (newWorkout.day!!.equals(selectedDay)) {
-                    filteredListWorkouts.add(newWorkout)
+                if (modification == true) {
+
+                    filteredListWorkouts[selectedWorkoutIndex].name = newWorkout.name
+                    filteredListWorkouts[selectedWorkoutIndex].day = newWorkout.day
+                    adapterWorkout!!.notifyDataSetChanged()
+
+                } else {
+                    Log.d("test1", "newWorkout.indexWorkout : ${newWorkout.indexWorkout}")
+                    listWorkouts.add(newWorkout)
+                    if (newWorkout.day!!.equals(selectedDay)) {
+                        filteredListWorkouts.add(newWorkout)
+                        if (filteredListWorkouts.size == 1) {
+                            adapterWorkout!!.notifyDataSetChanged()
+                        }
+                    }
                 }
+                sp_day!!.setSelection(indexDay!!)
+
             } else {
                 Log.d("test1", "error with result")
             }
@@ -135,15 +154,70 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             Log.d("test1", "addWorkout")
 
             val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
-            var b_workouts: Bundle = Bundle()
-            b_workouts.putParcelableArrayList("LIST", listWorkouts)
-            workoutActivity.putExtras(b_workouts)
+            var b_workout: Bundle = Bundle()
+            b_workout.putBoolean("MODIFICATION", false)
+            b_workout.putInt("INDEX", listWorkouts.size)
+            workoutActivity.putExtras(b_workout)
             startForResult.launch(workoutActivity)
 
         }
 
         btn_modifyWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "modifyWorkout")
+            val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
+            var b_workout: Bundle = Bundle()
+            b_workout.putParcelable("WORKOUT", filteredListWorkouts[selectedWorkoutIndex])
+            b_workout.putBoolean("MODIFICATION", true)
+            b_workout.putInt("INDEX", filteredListWorkouts[selectedWorkoutIndex].indexWorkout)
+            workoutActivity.putExtras(b_workout)
+            startForResult.launch(workoutActivity)
+        }
+
+        // TODO : delete workout (may have to add indexWorkout as attribute)
+        btn_deleteWOrkout?.setOnClickListener{v: View? ->
+            Log.d("test1", "deleteWorkout")
+            val alertDialogBuilder = AlertDialog.Builder(requireActivity())
+            alertDialogBuilder.setMessage("Are you sure to remove this workout?")
+
+            alertDialogBuilder.setPositiveButton(
+                "YES",
+                DialogInterface.OnClickListener { dialog, which ->
+                    val index = filteredListWorkouts[selectedWorkoutIndex].indexWorkout
+                    listWorkouts.removeAt(index)
+
+                    var temp = index
+                    while (temp < listWorkouts.size) {
+                        listWorkouts[temp].indexWorkout--
+                        Log.d("test1", "${listWorkouts[temp].name} is now index ${listWorkouts[temp].indexWorkout}")
+                        temp++
+                    }
+
+                    filteredListWorkouts.removeAt(selectedWorkoutIndex)
+                    adapterWorkout!!.notifyDataSetChanged()
+
+                    if (filteredListWorkouts.size > 0) {
+                        if (selectedWorkoutIndex == filteredListWorkouts.size) {
+                            selectedWorkoutIndex--
+                        }
+                        exercises = filteredListWorkouts[selectedWorkoutIndex].workout
+                        if (listAdapter != null) {
+                            listAdapter!!.updateExercises(exercises)
+                            rv_workout!!.adapter!!.notifyDataSetChanged()
+                        }
+
+                    }
+
+                })
+
+            alertDialogBuilder.setNegativeButton(
+                "NO",
+                object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                    }
+                })
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
+
         }
 
 
@@ -182,15 +256,13 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         sets6.add(Set(10, 6, "", 1))
         sets6.add(Set(10, 6, "", 2))
 
-        val workout = Workout(ArrayList(), "Workout A", "Monday")
+        val workout = Workout(0, ArrayList(), "Workout A", "Mon")
         workout.workout.add(Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false))
         workout.workout.add(Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false))
         workout.workout.add(Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2, false))
         workout.workout.add(Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3, false))
         workout.workout.add(Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4, false))
         workout.workout.add(Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5, false))
-
-
 
 
         listWorkouts.add(workout)
@@ -200,20 +272,20 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         sets11.add(Set(8, 1, "", 1))
         sets11.add(Set(8, 1, "", 2))
 
-        val workout2 = Workout(ArrayList(), "Workout B", "Monday")
+        val workout2 = Workout(1, ArrayList(), "Workout B", "Mon")
         workout2.workout.add(Exercise(1, "Pushups11", "Bodyweight", "", sets11, true, 0, false))
 
         listWorkouts.add(workout2)
 
 
 
-        listDays.add("Monday")
-        listDays.add("Tuesday")
-        listDays.add("Wednesday")
-        listDays.add("Thursday")
-        listDays.add("Friday")
-        listDays.add("Saturday")
-        listDays.add("Sunday")
+        listDays.add("Mon")
+        listDays.add("Tue")
+        listDays.add("Wed")
+        listDays.add("Thu")
+        listDays.add("Fri")
+        listDays.add("Sat")
+        listDays.add("Sun")
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listDays)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -240,6 +312,14 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 }
                 adapterWorkout!!.notifyDataSetChanged()
 
+                if (filteredListWorkouts.size > 0 && selectedWorkoutIndex == 0) {
+                    exercises = filteredListWorkouts[selectedWorkoutIndex].workout
+                    if (listAdapter != null) {
+                        listAdapter!!.updateExercises(exercises)
+                        rv_workout!!.adapter!!.notifyDataSetChanged()
+                    }
+
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
@@ -252,7 +332,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         adapterWorkout!!.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_workoutName?.adapter = adapterWorkout
 
-
         sp_workoutName?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -261,7 +340,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 id: Long
             ) {
                selectedWorkoutIndex = position
-                Log.d("test1", "filteredListWorkouts : ${filteredListWorkouts.size}")
+
                 if (filteredListWorkouts.size > 0) {
                     exercises = filteredListWorkouts[selectedWorkoutIndex].workout
                     Log.d("test1", "name : ${filteredListWorkouts[selectedWorkoutIndex].name}")
@@ -406,7 +485,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             set.isModified = true
             set.newWeight = newWeight
             set.newReps = newReps
-            //Log.d("test1", "set " + indexExercise.toString() + " has newReps : " + set.newReps)
         } else {
             set.isModified = false
         }

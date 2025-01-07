@@ -27,10 +27,14 @@ class WorkoutActivity : AppCompatActivity() {
     var sp_workoutDay: Spinner? = null
     var btn_confirmWorkout: Button? = null
 
-    var listWorkouts: ArrayList<Workout> = ArrayList()
+    var workout: Workout? = null
+    var indexWorkout: Int = 0
+    var modification: Boolean = false
 
-    var selectedDay: String = "Monday"
+    var selectedDay: String = "Mon"
     val listDays = ArrayList<String>()
+    var indexDay: Int = 0
+    var newIndexDay: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,19 +50,13 @@ class WorkoutActivity : AppCompatActivity() {
         sp_workoutDay = findViewById(R.id.sp_workoutDay)
         btn_confirmWorkout = findViewById(R.id.btn_confirmWorkout)
 
-        var retourWorkout: Intent = intent
-        var b_workouts: Bundle? = retourWorkout.extras
-        listWorkouts = b_workouts!!.getParcelableArrayList("LIST")!!
-
-        Log.d("test1", "listWorkouts.size : ${listWorkouts.size}")
-
-        listDays.add("Monday")
-        listDays.add("Tuesday")
-        listDays.add("Wednesday")
-        listDays.add("Thursday")
-        listDays.add("Friday")
-        listDays.add("Saturday")
-        listDays.add("Sunday")
+        listDays.add("Mon")
+        listDays.add("Tue")
+        listDays.add("Wed")
+        listDays.add("Thu")
+        listDays.add("Fri")
+        listDays.add("Sat")
+        listDays.add("Sun")
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listDays)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -72,6 +70,7 @@ class WorkoutActivity : AppCompatActivity() {
                 id: Long
             ) {
                 selectedDay = listDays[position]
+                newIndexDay = position
                 Log.d("test1", "selected ${selectedDay}")
             }
 
@@ -82,19 +81,56 @@ class WorkoutActivity : AppCompatActivity() {
         }
 
 
+        var retourWorkout: Intent = intent
+        var b_workouts: Bundle? = retourWorkout.extras
+        indexWorkout = b_workouts!!.getInt("INDEX")
+
+        modification = b_workouts.getBoolean("MODIFICATION")
+        if (modification) {
+            workout = b_workouts.getParcelable("WORKOUT")!!
+            modification = true
+            tv_title!!.text = "Modify a workout"
+            et_workoutName!!.setText(workout!!.name)
+
+            while (!workout!!.day.equals(listDays[indexDay]) && indexDay < listDays.size) {
+                indexDay++
+            }
+            sp_workoutDay!!.setSelection(indexDay)
+            selectedDay = listDays[indexDay]
+
+            Log.d("test1", "Workout to modify : ${workout!!.name}")
+        }
+
+
+
+
+
+
+
+
+
+
         btn_confirmWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "confirmWorkout -> saving ${et_workoutName!!.text.toString()} for ${selectedDay}")
 
-            val sets13 = ArrayList<Set>()
-            sets13.add(Set(1, 1, "", 0))
-            sets13.add(Set(8, 1, "", 1))
-            sets13.add(Set(8, 1, "", 2))
-            val workout = Workout(ArrayList(), et_workoutName!!.text.toString(), selectedDay)
-            workout.workout.add(Exercise(1, "Pushups13", "Bodyweight", "", sets13, true, 0, false))
+            if (modification) {
+                workout!!.name = et_workoutName!!.text.toString()
+                workout!!.day = selectedDay
+            } else {
+                val sets13 = ArrayList<Set>()
+                sets13.add(Set(1, 1, "", 0))
+                sets13.add(Set(8, 1, "", 1))
+                sets13.add(Set(8, 1, "", 2))
+                workout = Workout(indexWorkout, ArrayList(), et_workoutName!!.text.toString(), selectedDay)
+                workout!!.workout.add(Exercise(1, "Pushups13", "Bodyweight", "", sets13, true, 0, false))
+
+            }
 
             val resultIntent = Intent()
             var b_result: Bundle = Bundle()
             b_result.putParcelable("WORKOUT", workout)
+            b_result.putBoolean("MODIFICATION", modification)
+            b_result.putInt("DAY", newIndexDay)
             resultIntent.putExtras(b_result)
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
