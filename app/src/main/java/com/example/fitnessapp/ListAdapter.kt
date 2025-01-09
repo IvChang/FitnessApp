@@ -1,14 +1,16 @@
 package com.example.fitnessapp
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.fragments.OnItemInteractionListener
+import com.example.fitnessapp.holders.AddExerciseHolder
+import com.example.fitnessapp.holders.AddSetHolder
+import com.example.fitnessapp.holders.ExerciseHolder
+import com.example.fitnessapp.holders.SetHolder
 import com.example.fitnessapp.objects.Exercise
-import com.example.fitnessapp.objects.Workout
 
 class ListAdapter(
     var context: Context,

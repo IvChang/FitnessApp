@@ -1,4 +1,4 @@
-package com.example.fitnessapp
+package com.example.fitnessapp.holders
 
 import android.app.AlertDialog
 import android.util.Log
@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.fitnessapp.R
 import com.example.fitnessapp.fragments.OnItemInteractionListener
 import com.example.fitnessapp.objects.Exercise
 

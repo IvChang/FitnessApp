@@ -1,6 +1,5 @@
 package com.example.fitnessapp.fragments
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
@@ -27,10 +26,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.ListAdapter
 import com.example.fitnessapp.ListAdapter.Companion.VIEW_TYPE_SET
-import com.example.fitnessapp.MainActivity
 import com.example.fitnessapp.R
-import com.example.fitnessapp.SetHolder
-import com.example.fitnessapp.SettingActivity
+import com.example.fitnessapp.holders.SetHolder
 import com.example.fitnessapp.WorkoutActivity
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
@@ -116,7 +113,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         val sp_workoutName: Spinner? = fragmentView?.findViewById(R.id.sp_workoutName)
         val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
         val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
-        val btn_deleteWOrkout: Button? = fragmentView?.findViewById(R.id.btn_deleteWorkout)
+        val btn_deleteWorkout: Button? = fragmentView?.findViewById(R.id.btn_deleteWorkout)
 
         startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -174,7 +171,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         }
 
         // TODO : delete workout (may have to add indexWorkout as attribute)
-        btn_deleteWOrkout?.setOnClickListener{v: View? ->
+        btn_deleteWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "deleteWorkout")
             val alertDialogBuilder = AlertDialog.Builder(requireActivity())
             alertDialogBuilder.setMessage("Are you sure to remove this workout?")

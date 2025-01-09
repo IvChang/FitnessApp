@@ -2,6 +2,7 @@ package com.example.fitnessapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -13,12 +14,18 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity() {
     var tab_page: TabLayout? = null
     var view_pager: ViewPager2? = null
     var viewPagerAdapter: ViewPagerAdapter? = null
+
+    var dbAuth: FirebaseAuth? = null
+    var user: FirebaseUser? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         viewPagerAdapter = ViewPagerAdapter(this)
         view_pager?.setAdapter(viewPagerAdapter)
 
+        dbAuth = FirebaseAuth.getInstance()
+        user = dbAuth!!.currentUser
+        Log.d("test1", "username: ${user!!.displayName}, email: ${user!!.email}")
 
         // permet de sélectionner les différents tabs
         tab_page?.addOnTabSelectedListener(object : OnTabSelectedListener {
@@ -71,6 +81,11 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == R.id.mnu_settings) {
             val settingsActivity = Intent(this@MainActivity, SettingActivity::class.java)
             startActivity(settingsActivity)
+        } else if (item.itemId == R.id.mnu_logout){
+            dbAuth!!.signOut()
+            val loginActivity = Intent(this@MainActivity, LoginActivity::class.java)
+            startActivity(loginActivity)
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }

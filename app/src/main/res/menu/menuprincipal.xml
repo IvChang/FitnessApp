@@ -7,4 +7,9 @@
         android:title="Settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <item
+        android:id="@+id/mnu_logout"
+        android:title="Log Out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </menu>
