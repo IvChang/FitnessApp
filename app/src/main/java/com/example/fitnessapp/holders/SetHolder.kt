@@ -158,6 +158,11 @@ class SetHolder(itemView: View, listener: OnItemInteractionListener) :
     }
 
     fun setSet(set: Set?, indexExercise: Int, isEditMode: Boolean) {
+        /*
+        if (this.set != null && set != null) {
+            Log.d("test1", "set index from ${this.set!!.indexSet} to ${set!!.indexSet}")
+        } */
+
         this.set = set
         this.indexExercise = indexExercise
         this.isEditMode = isEditMode

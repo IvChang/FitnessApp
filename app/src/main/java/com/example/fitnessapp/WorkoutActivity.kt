@@ -80,7 +80,6 @@ class WorkoutActivity : AppCompatActivity() {
 
         }
 
-
         var retourWorkout: Intent = intent
         var b_workouts: Bundle? = retourWorkout.extras
         indexWorkout = b_workouts!!.getInt("INDEX")
@@ -102,14 +101,6 @@ class WorkoutActivity : AppCompatActivity() {
         }
 
 
-
-
-
-
-
-
-
-
         btn_confirmWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "confirmWorkout -> saving ${et_workoutName!!.text.toString()} for ${selectedDay}")
 
@@ -121,7 +112,7 @@ class WorkoutActivity : AppCompatActivity() {
                 sets13.add(Set(1, 1, "", 0))
                 sets13.add(Set(8, 1, "", 1))
                 sets13.add(Set(8, 1, "", 2))
-                workout = Workout(indexWorkout, ArrayList(), et_workoutName!!.text.toString(), selectedDay)
+                workout = Workout("", indexWorkout, ArrayList(), et_workoutName!!.text.toString(), selectedDay)
                 workout!!.workout.add(Exercise(1, "Pushups13", "Bodyweight", "", sets13, true, 0, false))
 
             }

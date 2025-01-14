@@ -3,9 +3,10 @@ package com.example.fitnessapp.objects
 import android.os.Parcel
 import android.os.Parcelable
 
-class Workout(var indexWorkout: Int ,@JvmField var workout: ArrayList<Exercise>, var name: String?, var day: String?) :
+class Workout(var id: String?, var indexWorkout: Int ,@JvmField var workout: ArrayList<Exercise>, var name: String?, var day: String?) :
     Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString(),
         parcel.readInt(),
         parcel.createTypedArrayList(Exercise.CREATOR) ?: arrayListOf(),
         parcel.readString(),
@@ -13,11 +14,14 @@ class Workout(var indexWorkout: Int ,@JvmField var workout: ArrayList<Exercise>,
 
     )
 
+    constructor() : this("", -1, arrayListOf(), "", "")
+
     override fun toString(): String {
         return name.toString()
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeString(id)
         parcel.writeInt(indexWorkout)
         parcel.writeTypedList(workout)
         parcel.writeString(name)

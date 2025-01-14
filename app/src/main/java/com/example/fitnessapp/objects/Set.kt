@@ -26,6 +26,8 @@ class Set(@JvmField var reps: Int, @JvmField var weight: Int, var variation: Str
         isModified = parcel.readByte() != 0.toByte()
     }
 
+    constructor() : this(-1, -1, "", -1)
+
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(reps)
         parcel.writeInt(weight)

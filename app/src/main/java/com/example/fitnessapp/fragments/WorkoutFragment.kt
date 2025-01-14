@@ -32,11 +32,18 @@ import com.example.fitnessapp.WorkoutActivity
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
 import com.example.fitnessapp.objects.Workout
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.util.Collections
 
 class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var fragmentView: View? = null
     private var rv_workout: RecyclerView? = null
+    var sp_day: Spinner? = null
+
 
     val listWorkouts: ArrayList<Workout> = ArrayList()
     var exercises: ArrayList<Exercise>? = null
@@ -46,6 +53,12 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     var adapterWorkout: ArrayAdapter<Workout>? = null
     var listAdapter: ListAdapter? = null
     var selectedWorkoutIndex: Int = 0
+
+    var indexDay: Int? = -1
+
+    var db: FirebaseDatabase? = null
+    var ref: DatabaseReference? = null
+
 
     private lateinit var startForResult: ActivityResultLauncher<Intent>
 
@@ -69,7 +82,8 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         ): Boolean {
             if (target.itemViewType == VIEW_TYPE_SET && (target as SetHolder).indexExercise == (viewHolder as SetHolder).indexExercise) {
                 var setHolder = viewHolder as SetHolder
-                var targetSetList = exercises!!.get(setHolder.indexExercise).sets
+                val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+                var targetSetList = targetWorkout.workout.get(setHolder.indexExercise).sets
 
                 var fromPosition = viewHolder.adapterPosition
                 var toPosition = target.adapterPosition
@@ -83,8 +97,21 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
                 targetSetList[holderFromIndex].indexSet = toIndex
                 targetSetList[holderToIndex].indexSet = tempIndex
+                setHolder.set!!.indexSet = holderToIndex
+                (target as SetHolder).set!!.indexSet = holderFromIndex
 
                 Collections.swap(targetSetList, setHolder.set!!.indexSet, (target as SetHolder).set!!.indexSet)
+
+
+                ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("test1", "successfully moved a set")
+                    } else {
+                        Toast.makeText(requireContext(), "Couldn't move a set", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
 
                 rv_workout!!.adapter!!.notifyItemMoved(fromPosition, toPosition)
             }
@@ -109,37 +136,48 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         fragmentView = inflater.inflate(R.layout.fragment_workout, container, false)
 
         rv_workout = fragmentView?.findViewById(R.id.rv_workout)
-        val sp_day = fragmentView?.findViewById<Spinner>(R.id.sp_day)
+        sp_day = fragmentView?.findViewById<Spinner>(R.id.sp_day)
         val sp_workoutName: Spinner? = fragmentView?.findViewById(R.id.sp_workoutName)
         val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
         val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
         val btn_deleteWorkout: Button? = fragmentView?.findViewById(R.id.btn_deleteWorkout)
 
+        db = FirebaseDatabase.getInstance()
+        ref = db!!.getReference("Workouts")
+
+        // recoit la réponse de WorkoutActivity pour ajouter/modifier un workout dans firebase
         startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 Log.d("test1", "data received successfully")
                 val bundle: Bundle? = result.data!!.extras
                 val newWorkout: Workout? = bundle?.getParcelable("WORKOUT")
                 val modification: Boolean? = bundle?.getBoolean("MODIFICATION")
-                val indexDay: Int? = bundle?.getInt("DAY")
-                Log.d("test1", newWorkout!!.name!!)
-                if (modification == true) {
+                indexDay = bundle?.getInt("DAY")
 
-                    filteredListWorkouts[selectedWorkoutIndex].name = newWorkout.name
-                    filteredListWorkouts[selectedWorkoutIndex].day = newWorkout.day
-                    adapterWorkout!!.notifyDataSetChanged()
 
+                if (modification == false) {
+                    val newWorkoutRef = ref!!.push()
+                    val workoutId = newWorkoutRef.key
+                    newWorkout!!.id = workoutId
                 } else {
-                    Log.d("test1", "newWorkout.indexWorkout : ${newWorkout.indexWorkout}")
-                    listWorkouts.add(newWorkout)
-                    if (newWorkout.day!!.equals(selectedDay)) {
-                        filteredListWorkouts.add(newWorkout)
-                        if (filteredListWorkouts.size == 1) {
-                            adapterWorkout!!.notifyDataSetChanged()
-                        }
+                    var index = 0;
+                    while (listWorkouts[index].indexWorkout < newWorkout!!.indexWorkout) {
+                        index++
+                    }
+                    if (index > 0) {
+                        newWorkout.indexWorkout = listWorkouts[index - 1].indexWorkout + 1
+                    }
+
+                }
+
+
+                ref!!.child(newWorkout.id!!).setValue(newWorkout).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("test1", "successfully added/updated a workout")
+                    } else {
+                        Toast.makeText(requireContext(), "Couldn't add/update a workout", Toast.LENGTH_SHORT).show()
                     }
                 }
-                sp_day!!.setSelection(indexDay!!)
 
             } else {
                 Log.d("test1", "error with result")
@@ -153,7 +191,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
             var b_workout: Bundle = Bundle()
             b_workout.putBoolean("MODIFICATION", false)
-            b_workout.putInt("INDEX", listWorkouts.size)
+            b_workout.putInt("INDEX", listWorkouts[listWorkouts.size - 1].indexWorkout + 1)
             workoutActivity.putExtras(b_workout)
             startForResult.launch(workoutActivity)
 
@@ -170,7 +208,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             startForResult.launch(workoutActivity)
         }
 
-        // TODO : delete workout (may have to add indexWorkout as attribute)
         btn_deleteWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "deleteWorkout")
             val alertDialogBuilder = AlertDialog.Builder(requireActivity())
@@ -179,31 +216,15 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             alertDialogBuilder.setPositiveButton(
                 "YES",
                 DialogInterface.OnClickListener { dialog, which ->
-                    val index = filteredListWorkouts[selectedWorkoutIndex].indexWorkout
-                    listWorkouts.removeAt(index)
-
-                    var temp = index
-                    while (temp < listWorkouts.size) {
-                        listWorkouts[temp].indexWorkout--
-                        Log.d("test1", "${listWorkouts[temp].name} is now index ${listWorkouts[temp].indexWorkout}")
-                        temp++
-                    }
-
-                    filteredListWorkouts.removeAt(selectedWorkoutIndex)
-                    adapterWorkout!!.notifyDataSetChanged()
-
-                    if (filteredListWorkouts.size > 0) {
-                        if (selectedWorkoutIndex == filteredListWorkouts.size) {
-                            selectedWorkoutIndex--
+                    val targetWorkout = listWorkouts.find {it.indexWorkout == filteredListWorkouts[selectedWorkoutIndex].indexWorkout}
+                    //listWorkouts.removeAt(index)
+                    ref!!.child(targetWorkout!!.id!!).removeValue().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("test1", "successfully removed a workout")
+                        } else {
+                            Toast.makeText(requireContext(), "Couldn't remove a workout", Toast.LENGTH_SHORT).show()
                         }
-                        exercises = filteredListWorkouts[selectedWorkoutIndex].workout
-                        if (listAdapter != null) {
-                            listAdapter!!.updateExercises(exercises)
-                            rv_workout!!.adapter!!.notifyDataSetChanged()
-                        }
-
                     }
-
                 })
 
             alertDialogBuilder.setNegativeButton(
@@ -216,63 +237,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             alertDialog.show()
 
         }
-
-
-
-        // Exercices temporaires
-        val sets = ArrayList<Set>()
-        sets.add(Set(1, 1, "", 0))
-        sets.add(Set(8, 1, "", 1))
-        sets.add(Set(8, 1, "", 2))
-
-        val sets2 = ArrayList<Set>()
-        sets2.add(Set(2, 2, "", 0))
-        sets2.add(Set(7, 2, "", 1))
-        sets2.add(Set(7, 2, "", 2))
-        sets2.add(Set(17, 2, "", 3))
-        sets2.add(Set(17, 2, "", 4))
-
-        val sets3 = ArrayList<Set>()
-        sets3.add(Set(3, 3, "", 0))
-
-        val sets4 = ArrayList<Set>()
-        sets4.add(Set(4, 4, "", 0))
-        sets4.add(Set(10, 4, "", 1))
-        sets4.add(Set(10, 4, "", 2))
-        sets4.add(Set(10, 4, "", 3))
-
-        val sets5 = ArrayList<Set>()
-        sets5.add(Set(5, 5, "", 0))
-        sets5.add(Set(6, 5, "", 1))
-        sets5.add(Set(10, 5, "", 2))
-        sets5.add(Set(10, 5, "", 3))
-
-
-        val sets6 = ArrayList<Set>()
-        sets6.add(Set(7, 6, "", 0))
-        sets6.add(Set(10, 6, "", 1))
-        sets6.add(Set(10, 6, "", 2))
-
-        val workout = Workout(0, ArrayList(), "Workout A", "Mon")
-        workout.workout.add(Exercise(1, "Pushups", "Bodyweight", "", sets, true, 0, false))
-        workout.workout.add(Exercise(2, "Pushups2", "Bodyweight", "", sets2, true, 1, false))
-        workout.workout.add(Exercise(3, "Pushups3", "Bodyweight", "", sets3, true, 2, false))
-        workout.workout.add(Exercise(4, "Pushups4", "Bodyweight", "", sets4, true, 3, false))
-        workout.workout.add(Exercise(5, "Pushups5", "Bodyweight", "", sets5, true, 4, false))
-        workout.workout.add(Exercise(6, "Pushups6", "Bodyweight", "", sets6, true, 5, false))
-
-
-        listWorkouts.add(workout)
-
-        val sets11 = ArrayList<Set>()
-        sets11.add(Set(1, 1, "", 0))
-        sets11.add(Set(8, 1, "", 1))
-        sets11.add(Set(8, 1, "", 2))
-
-        val workout2 = Workout(1, ArrayList(), "Workout B", "Mon")
-        workout2.workout.add(Exercise(1, "Pushups11", "Bodyweight", "", sets11, true, 0, false))
-
-        listWorkouts.add(workout2)
 
 
 
@@ -315,19 +279,17 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                         listAdapter!!.updateExercises(exercises)
                         rv_workout!!.adapter!!.notifyDataSetChanged()
                     }
-
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
-
             }
-
         }
 
 
         adapterWorkout = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, filteredListWorkouts)
         adapterWorkout!!.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sp_workoutName?.adapter = adapterWorkout
+
 
         sp_workoutName?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -336,6 +298,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 position: Int,
                 id: Long
             ) {
+                Log.d("test1", "sp_workoutName is called")
                selectedWorkoutIndex = position
 
                 if (filteredListWorkouts.size > 0) {
@@ -352,7 +315,6 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                     rv_workout?.setLayoutManager(LinearLayoutManager(context))
                     rv_workout?.setAdapter(listAdapter)
                 }
-
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -360,17 +322,16 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 listAdapter!!.updateExercises(ArrayList<Exercise>())
                 rv_workout!!.adapter!!.notifyDataSetChanged()
             }
-
         }
-
-        //Log.d("test1", "listAdapter : workout name : ${selectedWorkout!!.name} , ${selectedWorkout!!.workout.size}")
 
         if (filteredListWorkouts.size > 0) {
             listAdapter = ListAdapter(requireContext(), exercises, this)
+
         } else {
             listAdapter = null
         }
 
+        referenceToDB()
 
         rv_workout?.setLayoutManager(LinearLayoutManager(context))
         rv_workout?.setAdapter(listAdapter)
@@ -381,48 +342,137 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         return fragmentView
     }
 
+    // écoute pour les changements dans le realtime database pour apporter les modifications correspondantes à l'arraylist
+    // local de workouts
+    fun referenceToDB() {
 
+        ref!!.orderByChild("indexWorkout").addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val workout = snapshot.getValue(Workout::class.java)
+                Log.d("test1", "(ref) onChildAdded")
+                if (workout != null) {
+                    listWorkouts.add(workout)
+                    Log.d("test1", "(ref) added ${workout.name}, size : ${listWorkouts.size}")
+                    if (workout.day!!.equals(selectedDay)) {
+                        filteredListWorkouts.add(workout)
+                        if (filteredListWorkouts.size == 1) {
+                            adapterWorkout!!.notifyDataSetChanged()
+                        }
+                    }
+                    sp_day!!.setSelection(indexDay!!)
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                Log.d("test1", "onChildChanged")
+                val workout = snapshot.getValue(Workout::class.java)
+                if (workout != null) {
+                    for (i in listWorkouts.indices) {
+                        if(listWorkouts[i].indexWorkout == workout.indexWorkout) {
+                            listWorkouts[i] = workout
+
+                            filteredListWorkouts[selectedWorkoutIndex] = workout
+                            adapterWorkout!!.notifyDataSetChanged()
+                            break
+                        }
+                    }
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val workout = snapshot.getValue(Workout::class.java)
+                if (workout != null) {
+                    listWorkouts.removeIf { it.indexWorkout == workout.indexWorkout}
+
+                    filteredListWorkouts.removeAt(selectedWorkoutIndex)
+                    adapterWorkout!!.notifyDataSetChanged()
+
+                    if (filteredListWorkouts.size > 0) {
+                        if (selectedWorkoutIndex == filteredListWorkouts.size) {
+                            selectedWorkoutIndex--
+                        }
+                        exercises = filteredListWorkouts[selectedWorkoutIndex].workout
+                        if (listAdapter != null) {
+                            listAdapter!!.updateExercises(exercises)
+                            rv_workout!!.adapter!!.notifyDataSetChanged()
+                        }
+
+                    }
+                }
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+    }
 
 
 
     // Methode venant de l'interface permettant de modifier la visibilité du SetHolder
     // à partir de WorkoutHolder
     override fun onToggleButtonClick(position: Int, indexExercise: Int) {
+        val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
         var posExercise = 0
-        while (exercises!![posExercise].indexExercise != indexExercise && posExercise < exercises!!.size) {
+        while (targetWorkout.workout[posExercise].indexExercise != indexExercise && posExercise < targetWorkout.workout.size) {
             posExercise++
         }
         Log.d(
             "test1",
-            "getId() : " + exercises!![posExercise].indexExercise + " idExercise : " + indexExercise
+            "getId() : " + targetWorkout.workout[posExercise].indexExercise + " idExercise : " + indexExercise
         )
         Log.d("test1", "posExercise : " + posExercise + " vs " + indexExercise)
-        for (i in exercises!![posExercise].sets.indices) {
-            exercises!![posExercise].sets[i].isVisible = !exercises!![posExercise].sets[i].isVisible
+        for (i in targetWorkout.workout[posExercise].sets.indices) {
+            targetWorkout.workout[posExercise].sets[i].isVisible = !targetWorkout.workout[posExercise].sets[i].isVisible
         }
+
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
 
         // Rafraichit les holders correspondants
         rv_workout!!.adapter!!.notifyItemRangeChanged(
             position + 1,
-            exercises!![posExercise].sets.size + 1
+            targetWorkout.workout[posExercise].sets.size + 1
         )
     }
 
     // Ajoute un set de l'exercice correspondant et rafraichir la liste sans nécessairement tout rafraichir pour rien
     // Rafraichit les positions partant de celles de WorkoutHolder de l'exercice correspondant jusqu'à la fin de la liste.
     override fun onAddSetButtonClick(position: Int, indexExercise: Int) {
-        val listSets = exercises!![indexExercise].sets
-        listSets.add(Set(0, 0, "", listSets.size))
-        Log.d(
-            "test1",
-            "refresh from pos : " + (position - listSets.size) + " to " + rv_workout!!.adapter!!
-                .itemCount
-        )
-        rv_workout!!.adapter!!
-            .notifyItemRangeChanged(
-                position - listSets.size,
-                rv_workout!!.adapter!!.itemCount - position
-            )
+
+        val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+        val targetListSets = targetWorkout.workout[indexExercise].sets
+        targetListSets.add(Set(0, 0, "", targetListSets.size))
+
+        var index = 0;
+        while (listWorkouts[index].indexWorkout < targetWorkout.indexWorkout) {
+            index++
+        }
+        if (index > 0) {
+            targetWorkout.indexWorkout = listWorkouts[index - 1].indexWorkout + 1
+        }
+
+
+
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully added a new set")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't add a new set", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        Log.d("test1", "(test) size : ${filteredListWorkouts[selectedWorkoutIndex].workout[0].sets.size}")
+
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
+
+
+        rv_workout!!.adapter!!.notifyItemInserted(position)
+
     }
 
     override fun onModifyExerciseButtonClick(
@@ -431,10 +481,19 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         name: String?,
         note: String?
     ) {
-        exercises!![indexExercise].name = name!!
-        exercises!![indexExercise].note = note!!
-        exercises!![indexExercise].isEditMode = false
+        var targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
 
+        targetWorkout.workout[indexExercise].name = name!!
+        targetWorkout.workout[indexExercise].note = note!!
+        targetWorkout.workout[indexExercise].isEditMode = false
+
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully updated a set")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't update a set", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onModifySetButtonClick(
@@ -444,11 +503,33 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         weight: Int,
         reps: Int
     ) {
+        var targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+        var targetSet = targetWorkout.workout[indexExercise].sets[indexSet]
+
+
         Log.d("test1", "newWeight: $weight newReps : $reps")
-        val set = exercises!![indexExercise].sets[indexSet]
-        set.weight = weight
-        set.reps = reps
-        set.isModified = false
+        targetSet.weight = weight
+        targetSet.reps = reps
+        targetSet.isModified = false
+
+        var index = 0;
+        while (listWorkouts[index].indexWorkout < targetWorkout.indexWorkout) {
+            index++
+        }
+        if (index > 0) {
+            targetWorkout.indexWorkout = listWorkouts[index - 1].indexWorkout + 1
+        }
+
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully updated a set")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't update a set", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
+
         rv_workout!!.adapter!!.notifyItemChanged(position)
     }
 
@@ -459,10 +540,11 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
     ) {
         Log.d("test1", "onModifySet deletion mode called")
 
-        exercises!![indexExercise].isEditMode = deletionMode
+        filteredListWorkouts[selectedWorkoutIndex].workout[indexExercise].isEditMode = deletionMode
 
-        val setSize = exercises!![indexExercise].sets.size
+        val setSize = filteredListWorkouts[selectedWorkoutIndex].workout[indexExercise].sets.size
 
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
         val adapter = rv_workout!!.adapter as ListAdapter?
         adapter!!.updateImageView(position, setSize, deletionMode)
         rv_workout!!.adapter!!.notifyItemChanged(position)
@@ -475,8 +557,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         newWeight: Int,
         newReps: Int
     ) {
-        Log.d("test1", "exercises[${indexExercise}].sets[${indexSet}]")
-        val set = exercises!![indexExercise].sets[indexSet]
+        val set = filteredListWorkouts[selectedWorkoutIndex].workout[indexExercise].sets[indexSet]
 
         if (isModified) {
             set.isModified = true
@@ -490,72 +571,122 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
     override fun onDeleteSetButtonClick(position: Int, indexExercise: Int, indexSet: Int) {
         Log.d("test1", "onDeleteSet called")
-        exercises!![indexExercise].sets.removeAt(indexSet)
 
-        for (i in exercises!![indexExercise].sets.indices) {
-            exercises!![indexExercise].sets[i].indexSet = i
+        var targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+
+        targetWorkout.workout[indexExercise].sets.removeAt(indexSet)
+
+        for (i in targetWorkout.workout[indexExercise].sets.indices) {
+            targetWorkout.workout[indexExercise].sets[i].indexSet = i
         }
 
-        rv_workout!!.adapter!!.notifyItemRangeChanged(position, exercises!![indexExercise].sets.size)
-    }
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully deleted a set")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't delete a set", Toast.LENGTH_SHORT).show()
+            }
+        }
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
 
+        rv_workout!!.adapter!!.notifyItemRemoved(position)
+    }
 
     override fun onDeleteExerciseButtonClick(position: Int, indexExercise: Int) {
         Log.d("test1", "onDeleteExercise called on $indexExercise")
 
-        exercises!!.removeAt(indexExercise)
+        val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+        targetWorkout.workout.removeIf { it.indexExercise == indexExercise}
 
-        for (i in indexExercise until exercises!!.size) {
-            exercises!![i].indexExercise = i
-            exercises!![i].id = i + 1
+        for (i in indexExercise until filteredListWorkouts[selectedWorkoutIndex].workout.size) {
+            targetWorkout.workout[i].indexExercise = i
+            targetWorkout.workout[i].id = i + 1
         }
+
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully deleted an exercise")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't delete an exercise", Toast.LENGTH_SHORT).show()
+            }
+        }
+        listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
+
         rv_workout!!.adapter!!.notifyDataSetChanged()
 
     }
 
     override fun onAddExerciseButtonClick(position: Int) {
         Log.d("test1", "onAddExercise called")
-        exercises!!.add(Exercise(exercises!!.size + 1, "New Exercise", "Bodyweight", "", ArrayList<Set>(), true, exercises!!.size, false))
+
+        val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+        targetWorkout.workout.add(Exercise(targetWorkout.workout.size + 1, "New Exercise", "Bodyweight", "", ArrayList<Set>(), true, targetWorkout.workout.size, false))
+        Log.d("test1", "checkpoint 2")
+        ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("test1", "successfully added an exercise")
+            } else {
+                Toast.makeText(requireContext(), "Couldn't add an exercise", Toast.LENGTH_SHORT).show()
+            }
+        }
+        listAdapter!!.updateExercises(targetWorkout.workout)
         rv_workout!!.adapter!!.notifyItemInserted(position)
     }
 
     override fun onMoveExerciseButtonClick(position: Int, indexExercise: Int, direction: String) {
-        val tempExercise = exercises!![indexExercise]
+        val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
+        val tempExercise = targetWorkout.workout[indexExercise]
+        var result = 0
+        var startPosition = 0
+        var newIndex = 0
         if (direction.equals("Up")) {
             if (indexExercise > 0) {
-                val pastIndex = exercises!![indexExercise].indexExercise
-                val newIndex = exercises!![indexExercise - 1].indexExercise
+                result = -1
+                newIndex = targetWorkout.workout[indexExercise + result].indexExercise
 
-                exercises!![indexExercise] = exercises!![indexExercise - 1]
-                exercises!![indexExercise - 1] = tempExercise
-
-                exercises!![newIndex].indexExercise = indexExercise - 1
-                exercises!![pastIndex].indexExercise = indexExercise
-
-                val posPrevExercise = position - exercises!![pastIndex].sets.size
-                val bothSetSize = exercises!![indexExercise].sets.size + exercises!![indexExercise - 1].sets.size + 2
-
-                rv_workout!!.adapter!!.notifyItemRangeChanged(posPrevExercise, bothSetSize)
+                startPosition = position - targetWorkout.workout[newIndex].sets.size
 
             } else {
                 Toast.makeText(requireContext(), "Unable to move up", Toast.LENGTH_SHORT).show()
             }
         } else {
-            if (indexExercise < exercises!!.size - 1) {
-                val pastIndex = exercises!![indexExercise].indexExercise
-                val newIndex = exercises!![indexExercise + 1].indexExercise
+            if (indexExercise < targetWorkout.workout.size - 1) {
+                result = 1
+                newIndex = targetWorkout.workout[indexExercise + result].indexExercise
 
-                exercises!![indexExercise] = exercises!![indexExercise + 1]
-                exercises!![indexExercise + 1] = tempExercise
-
-                exercises!![newIndex].indexExercise = indexExercise + 1
-                exercises!![pastIndex].indexExercise = indexExercise
-
-                val bothSetSize = exercises!![indexExercise].sets.size + exercises!![indexExercise + 1].sets.size + 2
-                rv_workout!!.adapter!!.notifyItemRangeChanged(position, bothSetSize)
+                startPosition = position
             } else {
                 Toast.makeText(requireContext(), "Unable to move down", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        if (result != 0) {
+
+            val pastIndex = targetWorkout.workout[indexExercise].indexExercise
+
+            targetWorkout.workout[newIndex].indexExercise = indexExercise
+            targetWorkout.workout[pastIndex].indexExercise = indexExercise + result
+
+            targetWorkout.workout[indexExercise] = targetWorkout.workout[indexExercise + result]
+            targetWorkout.workout[indexExercise + result] = tempExercise
+
+
+            val bothSetSize = targetWorkout.workout[indexExercise].sets.size + targetWorkout.workout[indexExercise + result].sets.size + 2
+            rv_workout!!.adapter!!.notifyItemRangeChanged(startPosition, bothSetSize)
+
+            ref!!.child(targetWorkout.id!!).setValue(targetWorkout).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("test1", "successfully moved an exercise")
+                } else {
+                    Toast.makeText(requireContext(), "Couldn't move an exercise", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            listAdapter!!.updateExercises(filteredListWorkouts[selectedWorkoutIndex].workout)
+
+            Log.d("test1", "startPosition: $startPosition for $bothSetSize items")
+            rv_workout!!.adapter!!.notifyItemRangeChanged(startPosition, bothSetSize)
+
         }
 
     }

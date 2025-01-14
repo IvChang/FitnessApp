@@ -23,8 +23,9 @@ class Exercise(
         parcel.readByte() != 0.toByte(),
         parcel.readInt(),
         parcel.readByte() != 0.toByte()
-    ) {
-    }
+    )
+
+    constructor() : this(-1, "", "", "", arrayListOf(), false, -1, false)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
