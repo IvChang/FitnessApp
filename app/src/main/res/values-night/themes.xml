@@ -25,6 +25,10 @@
         <item name="android:background">@drawable/n_rounded_edittext_lighter</item>
     </style>
 
+    <style name="Rounded_Border_Dark">
+        <item name="android:background">@drawable/n_rounded_edittext_lighter</item>
+    </style>
+
     <style name="Button">
         <item name="android:background">@drawable/n_button</item>
          <item name="android:textColor">@color/black</item>

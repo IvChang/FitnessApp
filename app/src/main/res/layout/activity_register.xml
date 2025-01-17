@@ -11,21 +11,25 @@
         android:id="@+id/tv_titleRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign Up"
+        android:fontFamily="sans-serif"
+        android:text="Create an account"
         android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.127" />
+        app:layout_constraintVertical_bias="0.178" />
 
     <EditText
         android:id="@+id/et_usernameRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
         android:ems="10"
         android:hint="Username"
         android:inputType="text"
+        android:paddingStart="20dp"
+        style="@style/Rounded_Border_Dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -33,46 +37,82 @@
         app:layout_constraintTop_toBottomOf="@+id/et_emailRegister"
         app:layout_constraintVertical_bias="0.045" />
 
-    <EditText
-        android:id="@+id/et_pwdRegister"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_pwdRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toBottomOf="@+id/et_usernameRegister"
-        app:layout_constraintVertical_bias="0.138" />
+        app:layout_constraintVertical_bias="0.093"
+        app:passwordToggleEnabled="true">
+
+        <EditText
+            android:id="@+id/et_pwdRegister"
+            style="@style/Rounded_Border_Dark"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:paddingStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_usernameRegister"
+            app:layout_constraintVertical_bias="0.138" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
 
     <EditText
         android:id="@+id/et_emailRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        style="@style/Rounded_Border_Dark"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:hint="Email"
         android:inputType="text"
+        android:paddingStart="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_titleRegister" />
 
-    <EditText
-        android:id="@+id/et_confirmPwdRegister"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_confirmPwdRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Confirm password"
-        android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_pwdRegister"
-        app:layout_constraintVertical_bias="0.046" />
+        app:layout_constraintTop_toBottomOf="@+id/til_pwdRegister"
+        app:passwordToggleEnabled="true"
+        app:layout_constraintVertical_bias="0.058">
+
+        <EditText
+            android:id="@+id/et_confirmPwdRegister"
+            style="@style/Rounded_Border_Dark"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:ems="10"
+            android:hint="Confirm password"
+            android:inputType="textPassword"
+            android:paddingStart="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintVertical_bias="0.046" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_register"
@@ -83,7 +123,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_confirmPwdRegister"
+        app:layout_constraintTop_toBottomOf="@+id/til_confirmPwdRegister"
         app:layout_constraintVertical_bias="0.226" />
 
     <androidx.appcompat.widget.AppCompatButton
