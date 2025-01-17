@@ -1,6 +1,7 @@
 package com.example.fitnessapp.holders
 
 import android.app.AlertDialog
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +11,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fitnessapp.R
 import com.example.fitnessapp.fragments.OnItemInteractionListener
@@ -34,6 +37,15 @@ class ExerciseHolder(itemView: View, private val listener: OnItemInteractionList
         val adapter =
             ArrayAdapter(itemView.context, android.R.layout.simple_list_item_1, exerciseList)
         actv_name.setAdapter(adapter)
+
+        val currentNightMode = AppCompatDelegate.getDefaultNightMode()
+        var isNightMode = currentNightMode == AppCompatDelegate.MODE_NIGHT_YES
+
+        if (isNightMode) {
+            iv_exerciseOptions.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, android.R.color.white))
+            iv_exerciseOptions.alpha = 1F
+            iv_toggleSets.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, android.R.color.white))
+        }
 
 
         // listener pour cacher/dévoiler les sets

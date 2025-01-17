@@ -1,9 +1,38 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.FitnessApp" parent="Theme.Material3.DayNight">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="actionBarSize">50dp</item>
+
+        <item name="android:windowBackground">@color/lightest_grey</item>
+        <item name="colorPrimary">@null</item>
+    </style>
+
+    <style name="Rounded_Border">
+        <item name="android:background">@drawable/rounded_edittext_white</item>
+        <item name="tabIndicatorColor">@color/blue</item>
+        <item name="tabSelectedTextColor">@color/blue</item>
+    </style>
+
+    <style name="Null_Background">
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="Rounded_Border_Light">
+        <item name="android:background">@drawable/rounded_edittext</item>
+    </style>
+
+    <style name="Rounded_Border_Lighter">
+        <item name="android:background">@drawable/rounded_edittext_white</item>
+    </style>
+
+    <style name="Button">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Border_Button">
+        <item name="android:background">@drawable/border_button</item>
+        <item name="android:textColor">@color/blue</item>
     </style>
 
     <style name="Theme.FitnessApp" parent="Base.Theme.FitnessApp" />

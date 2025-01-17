@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="darkest_grey">#1A1A1A</color>
+    <color name="darker_grey">#232323</color>
+    <color name="dark_grey">#2C2C2C</color>
+    <color name="darkish_grey">#565656</color>
     <color name="grey">#A6A6A6</color>
-    <color name="light_grey">#DEDEDE</color>
+    <color name="light_grey">#EFEFEF</color>
     <color name="lightest_grey">#F8F8F8</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="blue">#3966FF</color>
 </resources>

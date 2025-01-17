@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,10 +13,13 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.DOWN
@@ -32,6 +36,8 @@ import com.example.fitnessapp.WorkoutActivity
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
 import com.example.fitnessapp.objects.Workout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -56,6 +62,8 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
     var indexDay: Int? = -1
 
+    var dbAuth: FirebaseAuth? = null
+    var user: FirebaseUser? = null
     var db: FirebaseDatabase? = null
     var ref: DatabaseReference? = null
 
@@ -85,8 +93,8 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 val targetWorkout = filteredListWorkouts[selectedWorkoutIndex]
                 var targetSetList = targetWorkout.workout.get(setHolder.indexExercise).sets
 
-                var fromPosition = viewHolder.adapterPosition
-                var toPosition = target.adapterPosition
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
 
                 val fromIndex = targetSetList[setHolder.set!!.indexSet].indexSet
                 val toIndex = targetSetList[(target as SetHolder).set!!.indexSet].indexSet
@@ -138,10 +146,21 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         rv_workout = fragmentView?.findViewById(R.id.rv_workout)
         sp_day = fragmentView?.findViewById<Spinner>(R.id.sp_day)
         val sp_workoutName: Spinner? = fragmentView?.findViewById(R.id.sp_workoutName)
-        val btn_addWorkout: Button? = fragmentView?.findViewById(R.id.btn_addWorkout)
-        val btn_modifyWorkout: Button? = fragmentView?.findViewById(R.id.btn_modifyWorkout)
-        val btn_deleteWorkout: Button? = fragmentView?.findViewById(R.id.btn_deleteWorkout)
+        val iv_addWorkout: ImageView? = fragmentView?.findViewById(R.id.iv_addWorkout)
+        val iv_modifyWorkout: ImageView? = fragmentView?.findViewById(R.id.iv_modifyWorkout)
+        val iv_deleteWorkout: ImageView? = fragmentView?.findViewById(R.id.iv_deleteWorkout)
 
+        val currentNightMode = AppCompatDelegate.getDefaultNightMode()
+        var isNightMode = currentNightMode == AppCompatDelegate.MODE_NIGHT_YES
+
+        if (isNightMode) {
+            iv_addWorkout!!.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), android.R.color.white))
+            iv_modifyWorkout!!.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), android.R.color.white))
+            iv_deleteWorkout!!.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireActivity(), android.R.color.white))
+        }
+
+        dbAuth = FirebaseAuth.getInstance()
+        user = dbAuth!!.currentUser
         db = FirebaseDatabase.getInstance()
         ref = db!!.getReference("Workouts")
 
@@ -185,7 +204,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
         }
 
 
-        btn_addWorkout?.setOnClickListener{v: View? ->
+        iv_addWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "addWorkout")
 
             val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
@@ -197,7 +216,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
 
         }
 
-        btn_modifyWorkout?.setOnClickListener{v: View? ->
+        iv_modifyWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "modifyWorkout")
             val workoutActivity = Intent(requireActivity(), WorkoutActivity::class.java)
             var b_workout: Bundle = Bundle()
@@ -208,7 +227,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             startForResult.launch(workoutActivity)
         }
 
-        btn_deleteWorkout?.setOnClickListener{v: View? ->
+        iv_deleteWorkout?.setOnClickListener{v: View? ->
             Log.d("test1", "deleteWorkout")
             val alertDialogBuilder = AlertDialog.Builder(requireActivity())
             alertDialogBuilder.setMessage("Are you sure to remove this workout?")
@@ -217,7 +236,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
                 "YES",
                 DialogInterface.OnClickListener { dialog, which ->
                     val targetWorkout = listWorkouts.find {it.indexWorkout == filteredListWorkouts[selectedWorkoutIndex].indexWorkout}
-                    //listWorkouts.removeAt(index)
+
                     ref!!.child(targetWorkout!!.id!!).removeValue().addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("test1", "successfully removed a workout")
@@ -350,7 +369,7 @@ class WorkoutFragment : Fragment(), OnItemInteractionListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val workout = snapshot.getValue(Workout::class.java)
                 Log.d("test1", "(ref) onChildAdded")
-                if (workout != null) {
+                if (workout != null && workout.email!! == user!!.email) {
                     listWorkouts.add(workout)
                     Log.d("test1", "(ref) added ${workout.name}, size : ${listWorkouts.size}")
                     if (workout.day!!.equals(selectedDay)) {

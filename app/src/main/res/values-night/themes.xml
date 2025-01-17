@@ -1,7 +1,36 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.FitnessApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Base.Theme.FitnessApp" parent="Theme.Material3.DayNight">
+        <item name="actionBarSize">50dp</item>
+
+        <item name="android:windowBackground">@color/darker_grey</item>
+        <item name="colorPrimary">@null</item>
+    </style>
+
+    <style name="Rounded_Border">
+        <item name="android:background">@drawable/n_rounded_edittext</item>
+        <item name="tabIndicatorColor">@color/white</item>
+        <item name="tabSelectedTextColor">@color/white</item>
+    </style>
+
+    <style name="Null_Background">
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="Rounded_Border_Light">
+        <item name="android:background">@drawable/n_rounded_edittext_light</item>
+    </style>
+
+    <style name="Rounded_Border_Lighter">
+        <item name="android:background">@drawable/n_rounded_edittext_lighter</item>
+    </style>
+
+    <style name="Button">
+        <item name="android:background">@drawable/n_button</item>
+         <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="Border_Button">
+        <item name="android:background">@drawable/n_border_button</item>
     </style>
 </resources>

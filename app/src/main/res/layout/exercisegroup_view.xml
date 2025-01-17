@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="150dp"
     android:layout_marginTop="10dp"
-    android:background="@color/white"
+    style="@style/Rounded_Border"
+
     android:orientation="vertical">
 
     <TextView
@@ -19,23 +20,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.129"
         tools:text="nbSets" />
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="2px"
-        android:background="@color/light_grey"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/view2"
-        android:layout_width="match_parent"
-        android:layout_height="2px"
-        android:background="@color/light_grey"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        tools:layout_editor_absoluteX="0dp" />
 
     <View
         android:id="@+id/view3"
@@ -68,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SETS"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.042"
@@ -80,6 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="LB"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.208"
@@ -92,9 +78,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="REPS"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.329"
+        app:layout_constraintHorizontal_bias="0.426"
         app:layout_constraintStart_toEndOf="@+id/tv_weightTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.877" />
@@ -118,11 +105,12 @@
         android:id="@+id/iv_exerciseOptions"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:alpha="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.619"
+        app:layout_constraintHorizontal_bias="0.736"
         app:layout_constraintStart_toEndOf="@+id/tv_sets"
-        app:layout_constraintTop_toTopOf="@+id/view"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.123"
         app:srcCompat="@drawable/three_dots" />
 
@@ -130,7 +118,7 @@
         android:id="@+id/actv_name"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        style="@style/Null_Background"
         android:clickable="false"
         android:ems="10"
         android:focusable="false"
@@ -148,13 +136,13 @@
         android:id="@+id/et_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:ems="10"
         android:hint="Note"
         android:clickable="false"
         android:focusable="false"
         android:textSize="10sp"
         android:inputType="text"
+        style="@style/Null_Background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.168"

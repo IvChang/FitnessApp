@@ -18,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.fitnessapp.objects.Exercise
 import com.example.fitnessapp.objects.Set
 import com.example.fitnessapp.objects.Workout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class WorkoutActivity : AppCompatActivity() {
 
@@ -36,6 +38,9 @@ class WorkoutActivity : AppCompatActivity() {
     var indexDay: Int = 0
     var newIndexDay: Int = 0
 
+    var dbAuth: FirebaseAuth? = null
+    var user: FirebaseUser? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.enableEdgeToEdge()
@@ -49,6 +54,9 @@ class WorkoutActivity : AppCompatActivity() {
         et_workoutName = findViewById(R.id.et_workoutName)
         sp_workoutDay = findViewById(R.id.sp_workoutDay)
         btn_confirmWorkout = findViewById(R.id.btn_confirmWorkout)
+
+        dbAuth = FirebaseAuth.getInstance()
+        user = dbAuth!!.currentUser
 
         listDays.add("Mon")
         listDays.add("Tue")
@@ -112,7 +120,7 @@ class WorkoutActivity : AppCompatActivity() {
                 sets13.add(Set(1, 1, "", 0))
                 sets13.add(Set(8, 1, "", 1))
                 sets13.add(Set(8, 1, "", 2))
-                workout = Workout("", indexWorkout, ArrayList(), et_workoutName!!.text.toString(), selectedDay)
+                workout = Workout("", indexWorkout, ArrayList(), et_workoutName!!.text.toString(), selectedDay, user!!.email)
                 workout!!.workout.add(Exercise(1, "Pushups13", "Bodyweight", "", sets13, true, 0, false))
 
             }
